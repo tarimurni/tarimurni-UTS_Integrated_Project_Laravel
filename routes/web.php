@@ -1,11 +1,13 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
-use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\SaleController;
+use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -37,8 +39,9 @@ Route::middleware('auth')->group(function () {
     // Central Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+
     // ==========================================
-    // Master Data Mutating Routes (Admin Only)
+    // Master Data & Transaction Mutating (Admin Only)
     // ==========================================
     Route::middleware('role:admin')->group(function () {
         // Products mutating
@@ -65,12 +68,13 @@ Route::middleware('auth')->group(function () {
         // User Management (Admin Only)
         Route::resource('users', UserController::class)->except(['show']);
 
-        // Cancel Purchase (Admin Only)
+        // Transaction Cancellations (Admin Only)
         Route::post('/purchases/{purchase}/cancel', [PurchaseController::class, 'cancel'])->name('purchases.cancel');
+        Route::post('/sales/{sale}/cancel', [SaleController::class, 'cancel'])->name('sales.cancel');
     });
 
     // ==========================================
-    // Master Data & Transaction Read Routes (Admin & Staff)
+    // Master Data & POS Sales Routes (Admin & Staff)
     // ==========================================
     Route::middleware('role:admin,staff')->group(function () {
         Route::get('/products', [ProductController::class, 'index'])->name('products.index');
@@ -82,11 +86,28 @@ Route::middleware('auth')->group(function () {
         Route::get('/suppliers', [SupplierController::class, 'index'])->name('suppliers.index');
         Route::get('/suppliers/{supplier}', [SupplierController::class, 'show'])->name('suppliers.show');
 
-        // Purchases (Admin & Staff)
+        // Purchases (Restock)
         Route::get('/purchases', [PurchaseController::class, 'index'])->name('purchases.index');
         Route::get('/purchases/create', [PurchaseController::class, 'create'])->name('purchases.create');
         Route::post('/purchases', [PurchaseController::class, 'store'])->name('purchases.store');
         Route::get('/purchases/{purchase}', [PurchaseController::class, 'show'])->name('purchases.show');
+
+        // Sales (Kasir & POS)
+        Route::get('/sales', [SaleController::class, 'index'])->name('sales.index');
+        Route::get('/sales/create', [SaleController::class, 'create'])->name('sales.create');
+        Route::post('/sales', [SaleController::class, 'store'])->name('sales.store');
+    });
+
+    // Shared Invoice / Receipt Viewer (Accessible by Admin/Staff, and Customer for their own orders)
+    Route::get('/sales/{sale}', [SaleController::class, 'show'])->name('sales.show');
+
+    // ==========================================
+    // Customer Catalog & Self-Service Checkout (Customer Only)
+    // ==========================================
+    Route::middleware('role:customer')->group(function () {
+        Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
+        Route::post('/catalog/checkout', [CatalogController::class, 'checkout'])->name('catalog.checkout');
+        Route::get('/customer/orders', [CatalogController::class, 'orders'])->name('customer.orders');
     });
 
     // ==========================================

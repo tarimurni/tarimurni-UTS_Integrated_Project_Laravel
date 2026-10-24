@@ -167,7 +167,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="#">
+                                <a class="nav-link {{ request()->routeIs('sales.*') ? 'active' : '' }}" href="{{ route('sales.index') }}">
                                     <i class="bi bi-cash-stack me-1"></i> Penjualan (Kasir)
                                 </a>
                             </li>
@@ -175,12 +175,12 @@
 
                         @if(Auth::user()->isCustomer())
                             <li class="nav-item">
-                                <a class="nav-link" href="#">
+                                <a class="nav-link {{ request()->routeIs('catalog.*') ? 'active' : '' }}" href="{{ route('catalog.index') }}">
                                     <i class="bi bi-grid me-1"></i> Katalog Produk
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="#">
+                                <a class="nav-link {{ request()->routeIs('customer.orders*') ? 'active' : '' }}" href="{{ route('customer.orders') }}">
                                     <i class="bi bi-receipt me-1"></i> Pesanan Saya
                                 </a>
                             </li>

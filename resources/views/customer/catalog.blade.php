@@ -1,0 +1,242 @@
+@extends('layouts.app')
+
+@section('title', 'Katalog Produk Elektronik - ElectroMart')
+
+@section('content')
+<div class="row g-4">
+
+    <!-- Store Banner -->
+    <div class="col-12">
+        <div class="card border-0 shadow-sm p-4 text-white" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <span class="badge bg-primary px-3 py-2 text-uppercase mb-2">Katalog Resmi & Bergaransi</span>
+                    <h3 class="fw-bold mb-1">Belanja Elektronik Mudah di ElectroMart</h3>
+                    <p class="text-secondary mb-0">Temukan laptop, gadget, komponen PC, dan periferal terbaru dengan jaminan stok asli.</p>
+                </div>
+                <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                    <a href="{{ route('customer.orders') }}" class="btn btn-outline-light btn-sm">
+                        <i class="bi bi-clock-history me-1"></i> Riwayat Pesanan Saya
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search & Category Filters -->
+    <div class="col-12">
+        <div class="card border-0 shadow-sm p-3 bg-white">
+            <form action="{{ route('catalog.index') }}" method="GET" class="row g-2 align-items-center">
+                <div class="col-md-5">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="bi bi-search text-muted"></i></span>
+                        <input type="text" name="search" class="form-control" placeholder="Cari laptop, processor, mouse, smartphone..." value="{{ request('search') }}">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <select name="category_id" class="form-select" onchange="this.form.submit()">
+                        <option value="">Semua Kategori Produk</option>
+                        @foreach($categories as $cat)
+                            <option value="{{ $cat->id }}" {{ request('category_id') == $cat->id ? 'selected' : '' }}>
+                                {{ $cat->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary px-3">Cari</button>
+                    @if(request()->anyFilled(['search', 'category_id']))
+                        <a href="{{ route('catalog.index') }}" class="btn btn-outline-secondary">Reset</a>
+                    @endif
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Products Grid (8 cols) & Shopping Cart / Checkout (4 cols) -->
+    <div class="col-lg-8">
+        <div class="row g-3">
+            @forelse($products as $product)
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 shadow-sm p-3 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge bg-light text-dark border small">{{ $product->category->name ?? 'Elektronik' }}</span>
+                                <span class="badge bg-success-subtle text-success border border-success-subtle">
+                                    Stok: {{ $product->stock }} unit
+                                </span>
+                            </div>
+                            <div class="text-muted small font-monospace mb-1">{{ $product->sku }}</div>
+                            <h6 class="fw-bold text-dark mb-1">{{ $product->name }}</h6>
+                            @if($product->brand)
+                                <div class="small text-muted mb-2">Brand: <strong>{{ $product->brand }}</strong></div>
+                            @endif
+                        </div>
+
+                        <div class="pt-3 border-top mt-3 d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="small text-muted d-block">Harga Resmi:</span>
+                                <span class="fw-bold text-primary fs-5">Rp {{ number_format($product->selling_price, 0, ',', '.') }}</span>
+                            </div>
+                            <button type="button" class="btn btn-primary btn-sm px-3" onclick="addToCart({{ $product->id }}, '{{ addslashes($product->name) }}', {{ $product->selling_price }}, {{ $product->stock }})">
+                                <i class="bi bi-cart-plus me-1"></i> Beli
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            @empty
+                <div class="col-12">
+                    <div class="card p-5 text-center border-0 shadow-sm">
+                        <i class="bi bi-search fs-1 text-muted mb-2"></i>
+                        <h5 class="fw-bold text-dark">Tidak ada produk ditemukan</h5>
+                        <p class="text-muted mb-0">Coba ubah kata kunci pencarian atau pilih kategori lain.</p>
+                    </div>
+                </div>
+            @endforelse
+        </div>
+
+        <div class="mt-4">
+            {{ $products->links('pagination::bootstrap-5') }}
+        </div>
+    </div>
+
+    <!-- Checkout Cart Panel (4 cols) -->
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm sticky-top" style="top: 80px;">
+            <div class="card-header bg-white border-0 py-3 px-4 d-flex justify-content-between align-items-center">
+                <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-bag-check-fill text-primary me-2"></i>Keranjang Checkout Anda</h6>
+                <span class="badge bg-primary rounded-pill" id="cartCountBadge">0 item</span>
+            </div>
+
+            <div class="card-body p-4 pt-0">
+                <form action="{{ route('catalog.checkout') }}" method="POST" id="checkoutForm">
+                    @csrf
+
+                    <!-- Dynamic Cart Items Container -->
+                    <div id="cartItemsList" class="mb-3" style="max-height: 380px; overflow-y: auto;">
+                        <div class="text-center py-4 text-muted small" id="emptyCartMessage">
+                            <i class="bi bi-cart-x fs-2 d-block mb-1 text-secondary"></i>
+                            Keranjang belanja Anda masih kosong.<br>Klik tombol <strong>Beli</strong> pada produk pilihan Anda.
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-light rounded-3 mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="text-muted small">Total Pembayaran:</span>
+                            <span class="fw-bold text-dark fs-5" id="cartGrandTotal">Rp 0</span>
+                        </div>
+                        <div class="small text-muted" style="font-size: 0.75rem;">
+                            <i class="bi bi-info-circle me-1"></i>Harga sudah termasuk PPN & garansi resmi.
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100 py-2 fw-semibold" id="checkoutBtn" disabled>
+                        <i class="bi bi-credit-card-2-front me-1"></i> Proses Checkout Pesanan
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+@endsection
+
+@push('scripts')
+<script>
+    const cart = {};
+
+    function addToCart(id, name, price, maxStock) {
+        if (!cart[id]) {
+            cart[id] = { id: id, name: name, price: price, maxStock: maxStock, quantity: 1 };
+        } else {
+            if (cart[id].quantity < maxStock) {
+                cart[id].quantity++;
+            } else {
+                alert(`Maksimal stok yang tersedia untuk produk ini adalah ${maxStock} unit.`);
+            }
+        }
+        renderCart();
+    }
+
+    function updateQty(id, delta) {
+        if (cart[id]) {
+            const newQty = cart[id].quantity + delta;
+            if (newQty > cart[id].maxStock) {
+                alert(`Maksimal stok yang tersedia untuk produk ini adalah ${cart[id].maxStock} unit.`);
+            } else if (newQty <= 0) {
+                delete cart[id];
+            } else {
+                cart[id].quantity = newQty;
+            }
+        }
+        renderCart();
+    }
+
+    function removeFromCart(id) {
+        delete cart[id];
+        renderCart();
+    }
+
+    function renderCart() {
+        const container = document.getElementById('cartItemsList');
+        const emptyMsg = document.getElementById('emptyCartMessage');
+        const countBadge = document.getElementById('cartCountBadge');
+        const totalElem = document.getElementById('cartGrandTotal');
+        const checkoutBtn = document.getElementById('checkoutBtn');
+
+        const keys = Object.keys(cart);
+        if (keys.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-4 text-muted small" id="emptyCartMessage">
+                    <i class="bi bi-cart-x fs-2 d-block mb-1 text-secondary"></i>
+                    Keranjang belanja Anda masih kosong.<br>Klik tombol <strong>Beli</strong> pada produk pilihan Anda.
+                </div>
+            `;
+            countBadge.textContent = '0 item';
+            totalElem.textContent = 'Rp 0';
+            checkoutBtn.disabled = true;
+            return;
+        }
+
+        let html = '';
+        let grandTotal = 0;
+        let totalItems = 0;
+
+        keys.forEach((id, index) => {
+            const item = cart[id];
+            const subtotal = item.quantity * item.price;
+            grandTotal += subtotal;
+            totalItems += item.quantity;
+
+            html += `
+                <div class="card p-2 mb-2 border rounded-3 bg-white">
+                    <div class="d-flex justify-content-between align-items-start mb-1">
+                        <div class="fw-semibold small text-dark text-truncate" style="max-width: 180px;">${item.name}</div>
+                        <button type="button" class="btn btn-sm text-danger p-0 ms-1 border-0" onclick="removeFromCart(${id})" title="Hapus">
+                            <i class="bi bi-x-circle"></i>
+                        </button>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="small text-muted">Rp ${item.price.toLocaleString('id-ID')}</span>
+                        <div class="d-flex align-items-center gap-1">
+                            <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-2" onclick="updateQty(${id}, -1)">-</button>
+                            <span class="small fw-bold px-1">${item.quantity}</span>
+                            <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-2" onclick="updateQty(${id}, 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="text-end small fw-bold text-success mt-1">
+                        Rp ${subtotal.toLocaleString('id-ID')}
+                    </div>
+                    <input type="hidden" name="items[${index}][product_id]" value="${item.id}">
+                    <input type="hidden" name="items[${index}][quantity]" value="${item.quantity}">
+                </div>
+            `;
+        });
+
+        container.innerHTML = html;
+        countBadge.textContent = totalItems + ' item';
+        totalElem.textContent = 'Rp ' + grandTotal.toLocaleString('id-ID');
+        checkoutBtn.disabled = false;
+    }
+</script>
+@endpush
