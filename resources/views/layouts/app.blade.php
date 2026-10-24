@@ -136,7 +136,7 @@
 
                         @if(Auth::user()->isAdmin() || Auth::user()->isStaff())
                             <li class="nav-item">
-                                <a class="nav-link" href="#">
+                                <a class="nav-link {{ request()->routeIs('products.*') ? 'active' : '' }}" href="{{ route('products.index') }}">
                                     <i class="bi bi-box-seam me-1"></i> Produk
                                 </a>
                             </li>
@@ -144,13 +144,18 @@
 
                         @if(Auth::user()->isAdmin())
                             <li class="nav-item">
-                                <a class="nav-link" href="#">
+                                <a class="nav-link {{ request()->routeIs('categories.*') ? 'active' : '' }}" href="{{ route('categories.index') }}">
                                     <i class="bi bi-tags me-1"></i> Kategori
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="#">
+                                <a class="nav-link {{ request()->routeIs('suppliers.*') ? 'active' : '' }}" href="{{ route('suppliers.index') }}">
                                     <i class="bi bi-truck me-1"></i> Supplier
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}" href="{{ route('users.index') }}">
+                                    <i class="bi bi-people me-1"></i> Pengguna
                                 </a>
                             </li>
                         @endif
