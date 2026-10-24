@@ -24,9 +24,19 @@ Route::get('/', function () {
 
 // Guest Authentication Routes
 Route::middleware('guest')->group(function () {
+    // Main login and distinct portal views
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-    Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+    Route::get('/login/customer', [AuthController::class, 'showCustomerLogin'])->name('login.customer');
+    Route::get('/login/staff', [AuthController::class, 'showStaffLogin'])->name('login.staff');
+    Route::get('/login/admin', [AuthController::class, 'showAdminLogin'])->name('login.admin');
 
+    // Login handlers
+    Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+    Route::post('/login/customer', [AuthController::class, 'loginCustomer'])->name('login.customer.post');
+    Route::post('/login/staff', [AuthController::class, 'loginStaff'])->name('login.staff.post');
+    Route::post('/login/admin', [AuthController::class, 'loginAdmin'])->name('login.admin.post');
+
+    // Customer Registration (optional/legacy)
     Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
     Route::post('/register', [AuthController::class, 'register'])->name('register.post');
 });
