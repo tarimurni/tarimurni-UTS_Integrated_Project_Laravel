@@ -6,7 +6,7 @@
 [![PHPUnit Tests](https://img.shields.io/badge/Tests-58%20Passed-success?style=flat&logo=phpunit&logoColor=white)](https://phpunit.de)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-Proyek Ujian Tengah Semester (UTS) Mata Kuliah **Pemrograman Web 2**.  
+Proyek Ujian Tengah Semester (UTS) Mata Kuliah **Pemrograman Web**.  
 Aplikasi sistem informasi pengelolaan persediaan barang (inventaris) dan transaksi penjualan terintegrasi bertema **Toko & Distribusi Perangkat Elektronik** (*ElectroMart*), dibangun menggunakan arsitektur modern **Laravel 12**, **MySQL (XAMPP)**, dan **Bootstrap 5**.
 
 ---
