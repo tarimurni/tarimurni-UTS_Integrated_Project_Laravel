@@ -40,6 +40,14 @@ class PurchaseController extends Controller
             $query->where('status', $status);
         }
 
+        if ($startDate = $request->input('start_date')) {
+            $query->whereDate('purchased_at', '>=', $startDate);
+        }
+
+        if ($endDate = $request->input('end_date')) {
+            $query->whereDate('purchased_at', '<=', $endDate);
+        }
+
         $purchases = $query->latest('purchased_at')->paginate(10)->withQueryString();
 
         return view('purchases.index', compact('purchases'));

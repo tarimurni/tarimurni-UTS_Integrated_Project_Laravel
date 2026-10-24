@@ -23,17 +23,17 @@
         </div>
     </div>
 
-    <!-- Search & Category Filters -->
+    <!-- Search & Filters -->
     <div class="col-12">
         <div class="card border-0 shadow-sm p-3 bg-white">
             <form action="{{ route('catalog.index') }}" method="GET" class="row g-2 align-items-center">
-                <div class="col-md-5">
+                <div class="col-md-4">
                     <div class="input-group">
                         <span class="input-group-text bg-light"><i class="bi bi-search text-muted"></i></span>
-                        <input type="text" name="search" class="form-control" placeholder="Cari laptop, processor, mouse, smartphone..." value="{{ request('search') }}">
+                        <input type="text" name="search" class="form-control" placeholder="Cari nama produk, SKU, atau brand..." value="{{ request('search') }}">
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <select name="category_id" class="form-select" onchange="this.form.submit()">
                         <option value="">Semua Kategori Produk</option>
                         @foreach($categories as $cat)
@@ -43,9 +43,17 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-auto">
-                    <button type="submit" class="btn btn-primary px-3">Cari</button>
-                    @if(request()->anyFilled(['search', 'category_id']))
+                <div class="col-md-3">
+                    <select name="stock_status" class="form-select" onchange="this.form.submit()">
+                        <option value="">Semua Status Stok</option>
+                        <option value="available" {{ request('stock_status') === 'available' ? 'selected' : '' }}>Stok Tersedia</option>
+                        <option value="low_stock" {{ request('stock_status') === 'low_stock' ? 'selected' : '' }}>Stok Rendah (&le; Min)</option>
+                        <option value="out_of_stock" {{ request('stock_status') === 'out_of_stock' ? 'selected' : '' }}>Stok Habis (0)</option>
+                    </select>
+                </div>
+                <div class="col-auto ms-auto d-flex gap-2">
+                    <button type="submit" class="btn btn-primary px-3"><i class="bi bi-funnel me-1"></i>Filter</button>
+                    @if(request()->anyFilled(['search', 'category_id', 'stock_status']))
                         <a href="{{ route('catalog.index') }}" class="btn btn-outline-secondary">Reset</a>
                     @endif
                 </div>

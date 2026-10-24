@@ -34,9 +34,12 @@ class ProductController extends Controller
             $query->where('category_id', $categoryId);
         }
 
-        // Filter by stock status
-        if ($request->input('filter') === 'low_stock') {
+        // Filter by stock status (Semua / Stok Rendah / Habis)
+        $stockStatus = $request->input('stock_status', $request->input('filter'));
+        if ($stockStatus === 'low_stock') {
             $query->whereColumn('stock', '<=', 'minimum_stock');
+        } elseif ($stockStatus === 'out_of_stock') {
+            $query->where('stock', '<=', 0);
         }
 
         $products = $query->latest()->paginate(10)->withQueryString();

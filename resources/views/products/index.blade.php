@@ -24,7 +24,7 @@
                     <div class="col-md-4">
                         <div class="input-group input-group-sm">
                             <span class="input-group-text bg-light"><i class="bi bi-search text-muted"></i></span>
-                            <input type="text" name="search" class="form-control" placeholder="Cari nama, SKU, atau brand..." value="{{ request('search') }}">
+                            <input type="text" name="search" class="form-control" placeholder="Cari nama produk, SKU, atau brand..." value="{{ request('search') }}">
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -37,20 +37,16 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-auto">
-                        @if(request('filter') === 'low_stock')
-                            <a href="{{ route('products.index') }}" class="btn btn-sm btn-danger active">
-                                <i class="bi bi-exclamation-triangle-fill me-1"></i> Filter: Stok Menipis (Aktif)
-                            </a>
-                        @else
-                            <a href="{{ route('products.index', array_merge(request()->query(), ['filter' => 'low_stock'])) }}" class="btn btn-sm btn-outline-danger">
-                                <i class="bi bi-funnel me-1"></i> Tampilkan Stok Menipis
-                            </a>
-                        @endif
+                    <div class="col-md-3">
+                        <select name="stock_status" class="form-select form-select-sm" onchange="this.form.submit()">
+                            <option value="">Semua Status Stok</option>
+                            <option value="low_stock" {{ request('stock_status', request('filter')) === 'low_stock' ? 'selected' : '' }}>Stok Rendah (&le; Min)</option>
+                            <option value="out_of_stock" {{ request('stock_status', request('filter')) === 'out_of_stock' ? 'selected' : '' }}>Stok Habis (0)</option>
+                        </select>
                     </div>
-                    <div class="col-auto ms-auto">
-                        <button type="submit" class="btn btn-sm btn-secondary">Terapkan Filter</button>
-                        @if(request()->anyFilled(['search', 'category_id', 'filter']))
+                    <div class="col-auto ms-auto d-flex gap-2">
+                        <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-funnel me-1"></i>Filter</button>
+                        @if(request()->anyFilled(['search', 'category_id', 'stock_status', 'filter']))
                             <a href="{{ route('products.index') }}" class="btn btn-sm btn-outline-secondary">Reset</a>
                         @endif
                     </div>

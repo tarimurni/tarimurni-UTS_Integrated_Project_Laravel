@@ -17,24 +17,36 @@
             </div>
 
             <div class="card-body px-4 pt-0">
-                <!-- Search & Status Filter -->
-                <form action="{{ route('purchases.index') }}" method="GET" class="row g-2 mb-3">
-                    <div class="col-md-5">
+                <!-- Search & Filters -->
+                <form action="{{ route('purchases.index') }}" method="GET" class="row g-2 mb-3 align-items-center">
+                    <div class="col-md-3">
                         <div class="input-group input-group-sm">
                             <span class="input-group-text bg-light"><i class="bi bi-search text-muted"></i></span>
-                            <input type="text" name="search" class="form-control" placeholder="Cari nomor faktur (PO), supplier, atau petugas..." value="{{ request('search') }}">
+                            <input type="text" name="search" class="form-control" placeholder="Cari nomor PO, supplier..." value="{{ request('search') }}">
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-light text-muted small">Dari</span>
+                            <input type="date" name="start_date" class="form-control" value="{{ request('start_date') }}" title="Tanggal Mulai">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-light text-muted small">Sampai</span>
+                            <input type="date" name="end_date" class="form-control" value="{{ request('end_date') }}" title="Tanggal Selesai">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
                         <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
                             <option value="">Semua Status</option>
                             <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Selesai (Completed)</option>
                             <option value="cancelled" {{ request('status') === 'cancelled' ? 'selected' : '' }}>Dibatalkan (Cancelled)</option>
                         </select>
                     </div>
-                    <div class="col-auto">
-                        <button type="submit" class="btn btn-sm btn-secondary">Cari</button>
-                        @if(request()->anyFilled(['search', 'status']))
+                    <div class="col-auto ms-auto d-flex gap-2">
+                        <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-funnel me-1"></i>Filter</button>
+                        @if(request()->anyFilled(['search', 'start_date', 'end_date', 'status']))
                             <a href="{{ route('purchases.index') }}" class="btn btn-sm btn-outline-secondary">Reset</a>
                         @endif
                     </div>

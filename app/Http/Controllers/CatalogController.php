@@ -25,7 +25,7 @@ class CatalogController extends Controller
      */
     public function index(Request $request): View
     {
-        $query = Product::with('category')->where('stock', '>', 0);
+        $query = Product::with('category');
 
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
@@ -39,7 +39,17 @@ class CatalogController extends Controller
             $query->where('category_id', $categoryId);
         }
 
-        $products = $query->latest()->paginate(12)->withQueryString();
+        if ($stockStatus = $request->input('stock_status')) {
+            if ($stockStatus === 'low_stock') {
+                $query->whereColumn('stock', '<=', 'minimum_stock');
+            } elseif ($stockStatus === 'out_of_stock') {
+                $query->where('stock', '<=', 0);
+            } elseif ($stockStatus === 'available') {
+                $query->where('stock', '>', 0);
+            }
+        }
+
+        $products = $query->latest()->paginate(10)->withQueryString();
         $categories = Category::orderBy('name')->get();
 
         return view('customer.catalog', compact('products', 'categories'));
@@ -79,7 +89,8 @@ class CatalogController extends Controller
             ->orWhere('user_id', $user->id)
             ->with(['items.product'])
             ->latest('sold_at')
-            ->paginate(10);
+            ->paginate(10)
+            ->withQueryString();
 
         return view('customer.orders', compact('orders'));
     }

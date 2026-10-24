@@ -53,6 +53,14 @@ class SaleController extends Controller
             $query->where('status', $status);
         }
 
+        if ($startDate = $request->input('start_date')) {
+            $query->whereDate('sold_at', '>=', $startDate);
+        }
+
+        if ($endDate = $request->input('end_date')) {
+            $query->whereDate('sold_at', '<=', $endDate);
+        }
+
         $sales = $query->latest('sold_at')->paginate(10)->withQueryString();
 
         return view('sales.index', compact('sales'));
