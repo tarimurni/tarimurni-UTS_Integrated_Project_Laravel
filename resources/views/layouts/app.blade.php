@@ -162,7 +162,7 @@
 
                         @if(Auth::user()->isAdmin() || Auth::user()->isStaff())
                             <li class="nav-item">
-                                <a class="nav-link" href="#">
+                                <a class="nav-link {{ request()->routeIs('purchases.*') ? 'active' : '' }}" href="{{ route('purchases.index') }}">
                                     <i class="bi bi-arrow-down-left-circle me-1"></i> Pembelian
                                 </a>
                             </li>

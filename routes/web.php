@@ -5,6 +5,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -63,10 +64,13 @@ Route::middleware('auth')->group(function () {
 
         // User Management (Admin Only)
         Route::resource('users', UserController::class)->except(['show']);
+
+        // Cancel Purchase (Admin Only)
+        Route::post('/purchases/{purchase}/cancel', [PurchaseController::class, 'cancel'])->name('purchases.cancel');
     });
 
     // ==========================================
-    // Master Data Read Routes (Admin & Staff)
+    // Master Data & Transaction Read Routes (Admin & Staff)
     // ==========================================
     Route::middleware('role:admin,staff')->group(function () {
         Route::get('/products', [ProductController::class, 'index'])->name('products.index');
@@ -77,6 +81,12 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/suppliers', [SupplierController::class, 'index'])->name('suppliers.index');
         Route::get('/suppliers/{supplier}', [SupplierController::class, 'show'])->name('suppliers.show');
+
+        // Purchases (Admin & Staff)
+        Route::get('/purchases', [PurchaseController::class, 'index'])->name('purchases.index');
+        Route::get('/purchases/create', [PurchaseController::class, 'create'])->name('purchases.create');
+        Route::post('/purchases', [PurchaseController::class, 'store'])->name('purchases.store');
+        Route::get('/purchases/{purchase}', [PurchaseController::class, 'show'])->name('purchases.show');
     });
 
     // ==========================================
