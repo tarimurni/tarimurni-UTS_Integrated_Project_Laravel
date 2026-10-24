@@ -116,8 +116,9 @@
                         <table class="table table-hover align-middle mb-0">
                             <thead class="table-light">
                                 <tr>
-                                    <th class="ps-4">SKU</th>
-                                    <th>Nama Produk Elektronik</th>
+                                    <th class="ps-4" style="width: 60px;">Foto</th>
+                                    <th>SKU</th>
+                                    <th>Nama Produk Elektronik & Warna</th>
                                     <th>Kategori</th>
                                     <th>Harga Beli</th>
                                     <th class="text-center">Sisa Stok</th>
@@ -128,8 +129,23 @@
                             <tbody>
                                 @foreach($lowStockProducts as $item)
                                     <tr>
-                                        <td class="ps-4 fw-bold text-secondary font-monospace">{{ $item->sku }}</td>
-                                        <td class="fw-semibold text-dark">{{ $item->name }}</td>
+                                        <td class="ps-4">
+                                            <img src="{{ $item->image_url ?? 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?auto=format&fit=crop&w=200&q=80' }}"
+                                                 alt="{{ $item->name }}"
+                                                 class="rounded-3 border"
+                                                 style="width: 48px; height: 48px; object-fit: cover;"
+                                                 onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1550009158-9ebf69173e03?auto=format&fit=crop&w=200&q=80';">
+                                        </td>
+                                        <td class="fw-bold text-secondary font-monospace">{{ $item->sku }}</td>
+                                        <td>
+                                            <div class="fw-semibold text-dark">{{ $item->name }}</div>
+                                            @if($item->color_name)
+                                                <div class="d-inline-flex align-items-center gap-1 small text-muted mt-1">
+                                                    <span style="display:inline-block; width:12px; height:12px; border-radius:50%; background-color: {{ $item->color_hex ?? '#ccc' }}; border: 1px solid #ccc;"></span>
+                                                    <span>{{ $item->color_name }}</span>
+                                                </div>
+                                            @endif
+                                        </td>
                                         <td><span class="badge bg-light text-dark border">{{ $item->category->name ?? '-' }}</span></td>
                                         <td>Rp {{ number_format($item->purchase_price, 0, ',', '.') }}</td>
                                         <td class="text-center">
@@ -245,7 +261,7 @@
                 <div>
                     <span class="text-muted small fw-semibold d-block mb-1">Belanja Elektronik Baru</span>
                     <h6 class="fw-bold text-dark mb-2">Katalog Resmi ElectroMart</h6>
-                    <p class="text-muted small mb-0">Pilihan laptop, smartphone, komponen PC, dan monitor original.</p>
+                    <p class="text-muted small mb-0">Temukan berbagai pilihan perangkat elektronik resmi: Smart TV, Kulkas, AC, Mesin Cuci, Laptop, dan Smartphone dengan tampilan warna asli serta stok real-time.</p>
                 </div>
                 <a href="{{ route('catalog.index') }}" class="btn btn-primary btn-sm mt-3">
                     <i class="bi bi-arrow-right-circle me-1"></i> Buka Katalog Belanja

@@ -75,7 +75,7 @@ class SaleController extends Controller
         $products = Product::where('stock', '>', 0)
             ->with('category')
             ->orderBy('name')
-            ->get(['id', 'sku', 'name', 'brand', 'category_id', 'selling_price', 'stock']);
+            ->get(['id', 'sku', 'name', 'brand', 'image_url', 'color_name', 'color_hex', 'category_id', 'selling_price', 'stock']);
 
         return view('sales.create', compact('customers', 'products'));
     }

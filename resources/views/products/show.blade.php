@@ -16,14 +16,35 @@
                     </span>
                 </div>
 
+                <div class="position-relative mb-3 overflow-hidden rounded-3 bg-light text-center border">
+                    <img src="{{ $product->image_url ?? 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?auto=format&fit=crop&w=800&q=80' }}"
+                         alt="{{ $product->name }}"
+                         class="img-fluid rounded-3"
+                         style="max-height: 240px; width: 100%; object-fit: cover;"
+                         onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1550009158-9ebf69173e03?auto=format&fit=crop&w=800&q=80';">
+                </div>
+
                 <div class="text-muted small font-monospace mb-1">SKU: {{ $product->sku }}</div>
                 <h4 class="fw-bold text-dark mb-2">{{ $product->name }}</h4>
-                <div class="mb-3">
+                <div class="mb-3 d-flex flex-wrap gap-2">
                     <span class="badge bg-light text-dark border">{{ $product->category->name ?? '-' }}</span>
                     @if($product->brand)
                         <span class="badge bg-light text-secondary border">Brand: {{ $product->brand }}</span>
                     @endif
                 </div>
+
+                @if($product->color_name)
+                    <div class="p-2 px-3 rounded-3 bg-light border mb-3 d-flex align-items-center justify-content-between">
+                        <span class="small text-muted fw-semibold">Warna Asli:</span>
+                        <div class="d-flex align-items-center gap-2">
+                            <span style="display:inline-block; width:16px; height:16px; border-radius:50%; background-color: {{ $product->color_hex ?? '#ccc' }}; border: 1px solid #aaa;" title="{{ $product->color_hex }}"></span>
+                            <span class="small fw-bold text-dark">{{ $product->color_name }}</span>
+                            @if($product->color_hex)
+                                <code class="small text-muted">({{ $product->color_hex }})</code>
+                            @endif
+                        </div>
+                    </div>
+                @endif
 
                 <hr class="my-3">
 

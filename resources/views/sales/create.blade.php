@@ -69,7 +69,7 @@
                                             <option value="">-- Pilih Produk yang Tersedia --</option>
                                             @foreach($products as $product)
                                                 <option value="{{ $product->id }}" data-price="{{ $product->selling_price }}" data-stock="{{ $product->stock }}">
-                                                    [{{ $product->sku }}] {{ $product->name }} (Stok: {{ $product->stock }})
+                                                    [{{ $product->sku }}] {{ $product->name }} @if($product->color_name) ({{ $product->color_name }}) @endif - Stok: {{ $product->stock }}
                                                 </option>
                                             @endforeach
                                         </select>
@@ -132,7 +132,8 @@
 
         let optionsHtml = '<option value="">-- Pilih Produk yang Tersedia --</option>';
         productsData.forEach(p => {
-            optionsHtml += `<option value="${p.id}" data-price="${p.selling_price}" data-stock="${p.stock}">[${p.sku}] ${p.name} (Stok: ${p.stock})</option>`;
+            const colorInfo = p.color_name ? ` (${p.color_name})` : '';
+            optionsHtml += `<option value="${p.id}" data-price="${p.selling_price}" data-stock="${p.stock}">[${p.sku}] ${p.name}${colorInfo} - Stok: ${p.stock}</option>`;
         });
 
         const tr = document.createElement('tr');

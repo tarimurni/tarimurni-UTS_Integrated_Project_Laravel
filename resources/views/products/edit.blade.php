@@ -47,6 +47,22 @@
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
+                            <label for="image_url" class="form-label fw-semibold small text-secondary">URL Foto Produk Asli (HD)</label>
+                            <input type="url" class="form-control @error('image_url') is-invalid @enderror" id="image_url" name="image_url" value="{{ old('image_url', $product->image_url) }}" placeholder="https://images.unsplash.com/...">
+                            <div class="form-text small">Tautan foto online Unsplash atau CDN resmi.</div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="color_name" class="form-label fw-semibold small text-secondary">Nama Warna Asli</label>
+                            <input type="text" class="form-control @error('color_name') is-invalid @enderror" id="color_name" name="color_name" value="{{ old('color_name', $product->color_name) }}" placeholder="Contoh: Space Black, Natural Titanium">
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label for="color_hex" class="form-label fw-semibold small text-secondary">HEX Warna</label>
+                            <input type="color" class="form-control form-control-color w-100 @error('color_hex') is-invalid @enderror" id="color_hex" name="color_hex" value="{{ old('color_hex', $product->color_hex ?? '#1C1C1E') }}" title="Pilih Warna Produk">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
                             <label for="purchase_price" class="form-label fw-semibold small text-secondary">Harga Beli (Modal) Rp <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light">Rp</span>

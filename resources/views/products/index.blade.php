@@ -56,15 +56,16 @@
                     <table class="table table-hover align-middle mb-0">
                         <thead class="table-light">
                             <tr>
-                                <th style="width: 50px;">No</th>
-                                <th style="width: 130px;">SKU</th>
-                                <th>Nama Produk & Brand</th>
+                                <th style="width: 45px;">No</th>
+                                <th style="width: 65px;">Foto</th>
+                                <th style="width: 120px;">SKU</th>
+                                <th>Nama Produk & Varian Warna</th>
                                 <th>Kategori</th>
                                 <th class="text-end">Harga Beli</th>
                                 <th class="text-end">Harga Jual</th>
-                                <th class="text-center" style="width: 100px;">Stok</th>
-                                <th class="text-center" style="width: 90px;">Min</th>
-                                <th class="text-end" style="width: 170px;">Aksi</th>
+                                <th class="text-center" style="width: 90px;">Stok</th>
+                                <th class="text-center" style="width: 80px;">Min</th>
+                                <th class="text-end" style="width: 150px;">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -72,15 +73,30 @@
                                 <tr class="{{ $product->stock <= $product->minimum_stock ? 'table-warning bg-opacity-25' : '' }}">
                                     <td class="text-muted small">{{ $products->firstItem() + $index }}</td>
                                     <td>
+                                        <img src="{{ $product->image_url ?? 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?auto=format&fit=crop&w=200&q=80' }}"
+                                             alt="{{ $product->name }}"
+                                             class="rounded-3 border"
+                                             style="width: 56px; height: 56px; object-fit: cover;"
+                                             onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1550009158-9ebf69173e03?auto=format&fit=crop&w=200&q=80';">
+                                    </td>
+                                    <td>
                                         <span class="fw-bold font-monospace text-primary small">{{ $product->sku }}</span>
                                     </td>
                                     <td>
                                         <div class="fw-bold text-dark">{{ $product->name }}</div>
-                                        @if($product->brand)
-                                            <span class="badge bg-light text-secondary border" style="font-size: 0.7rem;">
-                                                Brand: {{ $product->brand }}
-                                            </span>
-                                        @endif
+                                        <div class="d-flex align-items-center gap-2 mt-1">
+                                            @if($product->brand)
+                                                <span class="badge bg-light text-secondary border" style="font-size: 0.7rem;">
+                                                    Brand: {{ $product->brand }}
+                                                </span>
+                                            @endif
+                                            @if($product->color_name)
+                                                <span class="badge bg-light text-dark border d-inline-flex align-items-center gap-1" style="font-size: 0.7rem;">
+                                                    <span style="display:inline-block; width:14px; height:14px; border-radius:50%; background-color: {{ $product->color_hex ?? '#ccc' }}; border: 1px solid #ccc;"></span>
+                                                    <span>{{ $product->color_name }}</span>
+                                                </span>
+                                            @endif
+                                        </div>
                                     </td>
                                     <td>
                                         <span class="badge bg-light text-dark border">{{ $product->category->name ?? '-' }}</span>
@@ -127,7 +143,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="9" class="text-center py-4 text-muted">
+                                    <td colspan="10" class="text-center py-4 text-muted">
                                         <i class="bi bi-inbox fs-2 d-block mb-2"></i>
                                         Tidak ada produk ditemukan sesuai filter.
                                     </td>

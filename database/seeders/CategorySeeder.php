@@ -14,24 +14,24 @@ class CategorySeeder extends Seeder
     {
         $categories = [
             [
-                'name' => 'Laptop & Notebook',
-                'description' => 'Perangkat laptop portable untuk kebutuhan kerja, perkuliahan, gaming, dan produktivitas profesional.',
+                'name' => 'Televisi & Home Audio',
+                'description' => 'Smart TV 4K/8K, OLED TV, Soundbar, Home Theater, dan sistem audio resmi berkualitas tinggi.',
+            ],
+            [
+                'name' => 'Elektronik Rumah Tangga (Kulkas, AC, Mesin Cuci)',
+                'description' => 'Kulkas Smart Inverter, mesin cuci otomatis, AC hemat energi, dan microwave oven untuk hunian modern.',
+            ],
+            [
+                'name' => 'Laptop & Komputer',
+                'description' => 'Laptop premium, ultrabook profesional, laptop gaming RTX, dan PC desktop bertenaga tinggi.',
             ],
             [
                 'name' => 'Smartphone & Tablet',
-                'description' => 'Smartphone andalan dan tablet cerdas generasi terbaru dengan performa tinggi.',
+                'description' => 'Smartphone flagship bergaransi resmi, tablet produktivitas, dan ekosistem gadget generasi terbaru.',
             ],
             [
-                'name' => 'Komponen PC & Hardware',
-                'description' => 'Processor, motherboard, RAM, VGA kartu grafis, storage SSD, dan PSU rakitan PC.',
-            ],
-            [
-                'name' => 'Aksesoris & Periferal',
-                'description' => 'Keyboard mechanical, mouse gaming nirkabel, headset audio, webcam HD, dan aksesori periferal.',
-            ],
-            [
-                'name' => 'Monitor & Display',
-                'description' => 'Monitor LED / IPS resolusi tinggi dengan refresh rate tinggi untuk gaming dan desain grafis.',
+                'name' => 'Kamera & Perangkat Pintar',
+                'description' => 'Kamera mirrorless profesional, lensa fotografi, drone, dan smart home devices terkini.',
             ],
         ];
 

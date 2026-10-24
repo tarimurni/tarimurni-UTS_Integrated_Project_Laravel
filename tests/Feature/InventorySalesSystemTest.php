@@ -282,17 +282,17 @@ class InventorySalesSystemTest extends TestCase
         // 1. Pencarian berdasarkan SKU spesifik
         $skuResponse = $this->actingAs($this->staff)->get('/products?search=ELC-LPT-001');
         $skuResponse->assertStatus(200);
-        $skuResponse->assertSee('ASUS ZenBook 14 OLED');
-        $skuResponse->assertDontSee('Apple MacBook Air M3'); // Produk lain tidak boleh muncul
+        $skuResponse->assertSee('Apple MacBook Pro 14 M3 Pro');
+        $skuResponse->assertDontSee('Sony Bravia OLED'); // Produk lain tidak boleh muncul
 
         // 2. Filter berdasarkan Kategori
-        $category = Category::where('name', 'Monitor & Display')->first();
+        $category = Category::where('name', 'Televisi & Home Audio')->first();
         $categoryResponse = $this->actingAs($this->staff)->get("/products?category_id={$category->id}");
         $categoryResponse->assertStatus(200);
 
-        // Pastikan produk monitor muncul
-        $categoryResponse->assertSee('LG UltraGear 27GP850-B');
+        // Pastikan produk TV muncul
+        $categoryResponse->assertSee('Samsung Smart TV 55 Inch');
         // Pastikan produk dari kategori Laptop tidak muncul dalam hasil
-        $categoryResponse->assertDontSee('ASUS ZenBook 14 OLED');
+        $categoryResponse->assertDontSee('Apple MacBook Pro 14 M3 Pro');
     }
 }

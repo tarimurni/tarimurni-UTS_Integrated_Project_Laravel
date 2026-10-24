@@ -40,7 +40,23 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="brand" class="form-label fw-semibold small text-secondary">Brand / Merk</label>
-                            <input type="text" class="form-control @error('brand') is-invalid @enderror" id="brand" name="brand" value="{{ old('brand') }}" placeholder="Contoh: Sony, ASUS, Samsung, Logitech">
+                            <input type="text" class="form-control @error('brand') is-invalid @enderror" id="brand" name="brand" value="{{ old('brand') }}" placeholder="Contoh: Sony, ASUS, Samsung, Apple, Sharp">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="image_url" class="form-label fw-semibold small text-secondary">URL Foto Produk Asli (HD)</label>
+                            <input type="url" class="form-control @error('image_url') is-invalid @enderror" id="image_url" name="image_url" value="{{ old('image_url') }}" placeholder="https://images.unsplash.com/...">
+                            <div class="form-text small">Tautan foto online Unsplash atau CDN resmi.</div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="color_name" class="form-label fw-semibold small text-secondary">Nama Warna Asli</label>
+                            <input type="text" class="form-control @error('color_name') is-invalid @enderror" id="color_name" name="color_name" value="{{ old('color_name') }}" placeholder="Contoh: Titan Black, Space Black">
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label for="color_hex" class="form-label fw-semibold small text-secondary">HEX Warna</label>
+                            <input type="color" class="form-control form-control-color w-100 @error('color_hex') is-invalid @enderror" id="color_hex" name="color_hex" value="{{ old('color_hex', '#1C1C1E') }}" title="Pilih Warna Produk">
                         </div>
                     </div>
 

@@ -12,7 +12,7 @@
                 <div class="col-md-8">
                     <span class="badge bg-primary px-3 py-2 text-uppercase mb-2">Katalog Resmi & Bergaransi</span>
                     <h3 class="fw-bold mb-1">Belanja Elektronik Mudah di ElectroMart</h3>
-                    <p class="text-secondary mb-0">Temukan laptop, gadget, komponen PC, dan periferal terbaru dengan jaminan stok asli.</p>
+                    <p class="text-secondary mb-0">Temukan berbagai pilihan perangkat elektronik resmi: Smart TV, Kulkas, AC, Mesin Cuci, Laptop, dan Smartphone dengan tampilan warna asli serta stok real-time.</p>
                 </div>
                 <div class="col-md-4 text-md-end mt-3 mt-md-0">
                     <a href="{{ route('customer.orders') }}" class="btn btn-outline-light btn-sm">
@@ -66,24 +66,44 @@
         <div class="row g-3">
             @forelse($products as $product)
                 <div class="col-md-6">
-                    <div class="card h-100 border-0 shadow-sm p-3 d-flex flex-column justify-content-between">
+                    <div class="card h-100 border-0 shadow-sm p-3 d-flex flex-column justify-content-between position-relative">
                         <div>
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <span class="badge bg-light text-dark border small">{{ $product->category->name ?? 'Elektronik' }}</span>
-                                <span class="badge bg-success-subtle text-success border border-success-subtle">
+                            <div class="position-relative mb-3 overflow-hidden rounded-3 bg-light">
+                                <img src="{{ $product->image_url ?? 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?auto=format&fit=crop&w=800&q=80' }}"
+                                     alt="{{ $product->name }}"
+                                     class="card-img-top rounded-3"
+                                     style="object-fit: cover; height: 200px; width: 100%;"
+                                     onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1550009158-9ebf69173e03?auto=format&fit=crop&w=800&q=80';">
+                                <span class="position-absolute top-0 start-0 m-2 badge bg-dark bg-opacity-75 text-white small">
+                                    {{ $product->category->name ?? 'Elektronik' }}
+                                </span>
+                                <span class="position-absolute top-0 end-0 m-2 badge {{ $product->stock <= $product->minimum_stock ? 'bg-danger' : 'bg-success' }}">
                                     Stok: {{ $product->stock }} unit
                                 </span>
                             </div>
-                            <div class="text-muted small font-monospace mb-1">{{ $product->sku }}</div>
-                            <h6 class="fw-bold text-dark mb-1">{{ $product->name }}</h6>
-                            @if($product->brand)
-                                <div class="small text-muted mb-2">Brand: <strong>{{ $product->brand }}</strong></div>
+
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="text-muted small font-monospace">{{ $product->sku }}</span>
+                                @if($product->brand)
+                                    <span class="badge bg-light text-secondary border" style="font-size: 0.75rem;">
+                                        {{ $product->brand }}
+                                    </span>
+                                @endif
+                            </div>
+
+                            <h6 class="fw-bold text-dark mb-2" title="{{ $product->name }}" style="min-height: 40px;">{{ $product->name }}</h6>
+
+                            @if($product->color_name)
+                                <div class="d-flex align-items-center gap-2 mb-2 p-1 px-2 rounded-2 bg-light border" style="width: fit-content;">
+                                    <span style="display:inline-block; width:14px; height:14px; border-radius:50%; background-color: {{ $product->color_hex ?? '#ccc' }}; border: 1px solid #ccc; flex-shrink: 0;" title="{{ $product->color_hex }}"></span>
+                                    <span class="small text-muted" style="font-size: 0.8rem;">Warna: <strong class="text-dark">{{ $product->color_name }}</strong></span>
+                                </div>
                             @endif
                         </div>
 
-                        <div class="pt-3 border-top mt-3 d-flex justify-content-between align-items-center">
+                        <div class="pt-3 border-top mt-2 d-flex justify-content-between align-items-center">
                             <div>
-                                <span class="small text-muted d-block">Harga Resmi:</span>
+                                <span class="small text-muted d-block" style="font-size: 0.75rem;">Harga Resmi:</span>
                                 <span class="fw-bold text-primary fs-5">Rp {{ number_format($product->selling_price, 0, ',', '.') }}</span>
                             </div>
                             <button type="button" class="btn btn-primary btn-sm px-3" onclick="addToCart({{ $product->id }}, '{{ addslashes($product->name) }}', {{ $product->selling_price }}, {{ $product->stock }})">

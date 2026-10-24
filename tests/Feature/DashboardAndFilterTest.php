@@ -68,12 +68,12 @@ class DashboardAndFilterTest extends TestCase
         // Search by SKU
         $response = $this->actingAs($this->staff)->get('/products?search=ELC-LPT-001');
         $response->assertStatus(200);
-        $response->assertSee('ASUS ZenBook 14 OLED');
+        $response->assertSee('Apple MacBook Pro 14 M3 Pro');
 
         // Search by Name keyword
-        $response2 = $this->actingAs($this->staff)->get('/products?search=Legion');
+        $response2 = $this->actingAs($this->staff)->get('/products?search=Zephyrus');
         $response2->assertStatus(200);
-        $response2->assertSee('Lenovo Legion Pro 5');
+        $response2->assertSee('Laptop Gaming ASUS ROG Zephyrus G16');
     }
 
     /**
@@ -81,17 +81,17 @@ class DashboardAndFilterTest extends TestCase
      */
     public function test_product_filter_by_category_and_stock_status(): void
     {
-        $category = Category::where('name', 'Laptop & Notebook')->first();
+        $category = Category::where('name', 'Laptop & Komputer')->first();
 
         $response = $this->actingAs($this->staff)->get('/products?category_id=' . $category->id);
         $response->assertStatus(200);
-        $response->assertSee('ASUS ZenBook 14 OLED');
+        $response->assertSee('Apple MacBook Pro 14 M3 Pro');
 
         // Filter low stock
         $responseLowStock = $this->actingAs($this->staff)->get('/products?stock_status=low_stock');
         $responseLowStock->assertStatus(200);
-        // Low stock products from seeder include Lenovo Legion Pro 5 (stock: 3, min: 5)
-        $responseLowStock->assertSee('Lenovo Legion Pro 5');
+        // Low stock products from seeder include ASUS ROG Zephyrus G16 (stock: 2, min: 5)
+        $responseLowStock->assertSee('Laptop Gaming ASUS ROG Zephyrus G16');
     }
 
     /**
@@ -99,9 +99,9 @@ class DashboardAndFilterTest extends TestCase
      */
     public function test_catalog_search_and_stock_status_filter(): void
     {
-        $response = $this->actingAs($this->customer)->get('/catalog?search=Logitech');
+        $response = $this->actingAs($this->customer)->get('/catalog?search=Bravia');
         $response->assertStatus(200);
-        $response->assertSee('Logitech MX Master 3S');
+        $response->assertSee('Sony Bravia OLED 65 Inch');
 
         // Filter available stock
         $responseAvailable = $this->actingAs($this->customer)->get('/catalog?stock_status=available');
@@ -189,7 +189,27 @@ class DashboardAndFilterTest extends TestCase
      */
     public function test_pagination_retains_search_and_filter_query_params(): void
     {
-        // 15 seeded products all match 'ELC', paginated by 10 per page => 2 pages
+        $category = Category::first();
+        // Create 2 extra products so total > 10 items (page 1 and page 2 exist)
+        Product::create([
+            'category_id' => $category->id,
+            'sku' => 'ELC-EXTRA-001',
+            'name' => 'Extra Electronic Item 1',
+            'purchase_price' => 1000000,
+            'selling_price' => 1500000,
+            'stock' => 5,
+            'minimum_stock' => 2,
+        ]);
+        Product::create([
+            'category_id' => $category->id,
+            'sku' => 'ELC-EXTRA-002',
+            'name' => 'Extra Electronic Item 2',
+            'purchase_price' => 1000000,
+            'selling_price' => 1500000,
+            'stock' => 5,
+            'minimum_stock' => 2,
+        ]);
+
         $response = $this->actingAs($this->staff)->get('/products?search=ELC&page=1');
         $response->assertStatus(200);
 

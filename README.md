@@ -203,6 +203,9 @@ erDiagram
         string sku UK
         string name
         string brand
+        string image_url "nullable"
+        string color_name "nullable"
+        string color_hex "nullable"
         decimal purchase_price
         decimal selling_price
         integer stock
