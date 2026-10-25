@@ -140,14 +140,12 @@ Akses aplikasi melalui browser di alamat: **[http://localhost:8000](http://local
 
 ## 🔑 Akun Demo Pengujian
 
-Semua akun menggunakan kata sandi default: `password123`
-
-| Role | Nama Akun | Email Login | Password | Akses URL Utama |
-|---|---|---|---|---|
-| **Admin** | Budi Santoso - Admin | `admin@electromart.test` | `password123` | `/dashboard`, `/products`, `/categories`, `/suppliers`, `/users`, `/purchases`, `/sales` |
-| **Staff** | Siti Rahma - Staff Gudang & Kasir | `staff@electromart.test` | `password123` | `/dashboard`, `/sales/create`, `/purchases/create`, `/products` |
-| **Customer 1** | Andi Pratama - Customer | `customer@electromart.test` | `password123` | `/catalog`, `/customer/orders`, `/dashboard` |
-| **Customer 2** | Rina Wijaya - Customer | `rina@electromart.test` | `password123` | `/catalog`, `/customer/orders` (Validasi isolasi invoice) |
+| Role | Nama Pengguna | Email Login | Password | Cara Akses |
+| :--- | :--- | :--- | :--- | :--- |
+| **Admin** | **Tari Murni** | `admin@electromart.test` | `password123` | Login via `/login` |
+| **Staff** | **Ade Afrina** | `staff@electromart.test` | `password123` | Login via `/login` |
+| **Customer 1** | **Rahmania** | *(Tanpa Email)* | *(Tanpa Password)* | Langsung di Katalog (`/catalog`) cukup isi Nama & No. HP |
+| **Customer 2** | **Alfi Syahri** | *(Tanpa Email)* | *(Tanpa Password)* | Langsung di Katalog (`/catalog`) cukup isi Nama & No. HP |
 
 ---
 

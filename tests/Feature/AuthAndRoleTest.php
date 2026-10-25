@@ -178,8 +178,8 @@ class AuthAndRoleTest extends TestCase
 
         // 3. Customer login redirects to catalog
         $customerResponse = $this->post('/login', [
-            'email' => 'customer@electromart.test',
-            'password' => 'password123',
+            'email' => 'rahmania@customer.local',
+            'password' => 'customer123',
         ]);
         $this->assertAuthenticated();
         $customerResponse->assertRedirect('/catalog');

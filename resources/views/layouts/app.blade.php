@@ -295,8 +295,8 @@
     <!-- Footer -->
     <footer class="footer">
         <div class="container text-center">
-            <div class="fw-semibold text-dark">ElectroMart - Inventory & Sales Management System</div>
-            <div class="small text-muted">UTS Pemrograman Web 2 &bull; Terintegrasi Laravel 12 & MySQL XAMPP</div>
+            <div class="fw-semibold text-dark">ElectroMart Official Store</div>
+            <div class="small text-muted">&copy; 2026 ElectroMart Official Store. Hak Cipta Dilindungi.</div>
         </div>
     </footer>
 

@@ -26,8 +26,8 @@ class SaleTest extends TestCase
 
         $this->admin = User::where('role', 'admin')->first();
         $this->staff = User::where('role', 'staff')->first();
-        $this->customer1 = User::where('email', 'customer@electromart.test')->first();
-        $this->customer2 = User::where('email', 'rina@electromart.test')->first();
+        $this->customer1 = User::where('role', 'customer')->first();
+        $this->customer2 = User::where('role', 'customer')->skip(1)->first();
 
         $this->productA = Product::where('sku', 'ELC-LPT-001')->first();
         $this->productB = Product::where('sku', 'ELC-SMP-001')->first();

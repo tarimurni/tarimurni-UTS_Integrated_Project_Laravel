@@ -26,7 +26,7 @@ class DashboardAndFilterTest extends TestCase
 
         $this->admin = User::where('email', 'admin@electromart.test')->first();
         $this->staff = User::where('email', 'staff@electromart.test')->first();
-        $this->customer = User::where('email', 'customer@electromart.test')->first();
+        $this->customer = User::where('role', 'customer')->first();
     }
 
     /**
