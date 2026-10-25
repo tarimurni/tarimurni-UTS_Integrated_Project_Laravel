@@ -142,7 +142,7 @@ Akses aplikasi melalui browser di alamat: **[http://localhost:8000](http://local
 
 | Role | Nama Pengguna | Email Login | Password | Cara Akses |
 | :--- | :--- | :--- | :--- | :--- |
-| **Admin** | **Tari Murni** | `admin@electromart.test` | `password123` | Login via `/login` |
+| **Admin** | **Salsa Callista** | `admin@electromart.test` | `password123` | Login via `/login` |
 | **Staff** | **Ade Afrina** | `staff@electromart.test` | `password123` | Login via `/login` |
 | **Customer 1** | **Rahmania** | *(Tanpa Email)* | *(Tanpa Password)* | Langsung di Katalog (`/catalog`) cukup isi Nama & No. HP |
 | **Customer 2** | **Alfi Syahri** | *(Tanpa Email)* | *(Tanpa Password)* | Langsung di Katalog (`/catalog`) cukup isi Nama & No. HP |
