@@ -113,7 +113,7 @@
     <!-- Main Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-dark sticky-top py-2">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center gap-2 text-white" href="{{ route('dashboard') }}">
+            <a class="navbar-brand d-flex align-items-center gap-2 text-white" href="{{ auth()->check() && (auth()->user()->isAdmin() || auth()->user()->isStaff()) ? route('dashboard') : route('catalog.index') }}">
                 <span class="d-inline-flex align-items-center justify-content-center bg-primary rounded-3 p-2 shadow-sm">
                     <i class="bi bi-cpu-fill text-white fs-5"></i>
                 </span>
@@ -220,15 +220,16 @@
                     </ul>
                 @else
                     <!-- Guest Navigation Links -->
-                    <ul class="navbar-nav ms-auto gap-2">
+                    <ul class="navbar-nav ms-auto align-items-center gap-2">
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('login') ? 'active' : '' }}" href="{{ route('login') }}">
-                                <i class="bi bi-box-arrow-in-right me-1"></i> Masuk
+                            <a class="nav-link {{ request()->routeIs('catalog.*') || request()->routeIs('home') ? 'active' : '' }}" href="{{ route('catalog.index') }}">
+                                <i class="bi bi-grid me-1"></i> Katalog Produk
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="btn btn-primary btn-sm px-3" href="{{ route('register') }}">
-                                <i class="bi bi-person-plus me-1"></i> Daftar Customer
+                        <li class="nav-item ms-lg-2">
+                            <a class="nav-link d-inline-flex align-items-center gap-1 text-light py-1 px-3 bg-dark bg-opacity-75 rounded-pill border border-secondary border-opacity-50 small" href="{{ route('login') }}" style="font-size: 0.85rem;">
+                                <i class="bi bi-person-lock text-warning"></i>
+                                <span>Login Pegawai</span>
                             </a>
                         </li>
                     </ul>

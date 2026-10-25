@@ -17,26 +17,16 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-// Root Redirect
-Route::get('/', function () {
-    return auth()->check() ? redirect()->route('dashboard') : redirect()->route('login');
-});
+// Root and Public Catalog Routes (Direct access for customers without login)
+Route::get('/', [CatalogController::class, 'index'])->name('home');
+Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
+Route::post('/catalog/checkout', [CatalogController::class, 'checkout'])->name('catalog.checkout');
 
-// Guest Authentication Routes
+// Guest Authentication Routes (Single clean login for Admin & Staff)
 Route::middleware('guest')->group(function () {
-    // Main login and distinct portal views
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-    Route::get('/login/customer', [AuthController::class, 'showCustomerLogin'])->name('login.customer');
-    Route::get('/login/staff', [AuthController::class, 'showStaffLogin'])->name('login.staff');
-    Route::get('/login/admin', [AuthController::class, 'showAdminLogin'])->name('login.admin');
-
-    // Login handlers
     Route::post('/login', [AuthController::class, 'login'])->name('login.post');
-    Route::post('/login/customer', [AuthController::class, 'loginCustomer'])->name('login.customer.post');
-    Route::post('/login/staff', [AuthController::class, 'loginStaff'])->name('login.staff.post');
-    Route::post('/login/admin', [AuthController::class, 'loginAdmin'])->name('login.admin.post');
 
-    // Customer Registration (optional/legacy)
     Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
     Route::post('/register', [AuthController::class, 'register'])->name('register.post');
 });
@@ -112,11 +102,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/sales/{sale}', [SaleController::class, 'show'])->name('sales.show');
 
     // ==========================================
-    // Customer Catalog & Self-Service Checkout (Customer Only)
+    // Customer Orders History (Customer Only)
     // ==========================================
     Route::middleware('role:customer')->group(function () {
-        Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
-        Route::post('/catalog/checkout', [CatalogController::class, 'checkout'])->name('catalog.checkout');
         Route::get('/customer/orders', [CatalogController::class, 'orders'])->name('customer.orders');
     });
 

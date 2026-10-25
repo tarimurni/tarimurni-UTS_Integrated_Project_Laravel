@@ -26,8 +26,11 @@ class AuthAndRoleTest extends TestCase
     {
         $response = $this->get('/login');
         $response->assertStatus(200);
-        $response->assertSee('ElectroMart');
-        $response->assertSee('Masuk');
+        $response->assertSee('Masuk ke ElectroMart');
+        $response->assertSee('Email');
+        $response->assertSee('Password');
+        $response->assertSee('Ingat Saya');
+        $response->assertSee('Kembali ke Katalog Toko');
     }
 
     public function test_register_screen_can_be_rendered(): void
@@ -136,128 +139,93 @@ class AuthAndRoleTest extends TestCase
         $response->assertRedirect('/login');
     }
 
-    public function test_login_portals_can_be_rendered_directly(): void
+    public function test_public_catalog_can_be_accessed_without_login(): void
     {
-        // 1. Portal Customer
-        $customerPortal = $this->get('/login/customer');
-        $customerPortal->assertStatus(200);
-        $customerPortal->assertSee('Portal Belanja Pelanggan');
-        $customerPortal->assertSee('Nama Lengkap Pelanggan');
-        $customerPortal->assertSee('Mulai Belanja Sekarang');
+        // 1. Root route gives direct catalog access
+        $rootResponse = $this->get('/');
+        $rootResponse->assertStatus(200);
+        $rootResponse->assertSee('Katalog Resmi & Bergaransi', false);
+        $rootResponse->assertSee('Login Pegawai');
 
-        // 2. Portal Staff
-        $staffPortal = $this->get('/login/staff');
-        $staffPortal->assertStatus(200);
-        $staffPortal->assertSee('Portal Staff Gudang & Kasir', false);
-        $staffPortal->assertSee('Email Staff');
-        $staffPortal->assertSee('Masuk ke Portal Staff & Kasir', false);
-
-        // 3. Portal Admin
-        $adminPortal = $this->get('/login/admin');
-        $adminPortal->assertStatus(200);
-        $adminPortal->assertSee('Portal Administrator / Owner');
-        $adminPortal->assertSee('Email Administrator');
-        $adminPortal->assertSee('Masuk ke Portal Administrator');
+        // 2. /catalog route gives direct catalog access
+        $catalogResponse = $this->get('/catalog');
+        $catalogResponse->assertStatus(200);
+        $catalogResponse->assertSee('Katalog Resmi & Bergaransi', false);
+        $catalogResponse->assertSee('Login Pegawai');
     }
 
-    public function test_customer_can_login_without_password_and_is_redirected_to_catalog(): void
+    public function test_automatic_role_detection_on_login(): void
     {
-        $response = $this->post('/login/customer', [
-            'name' => 'Fajar Pelanggan Baru',
-            'phone' => '081298765432',
-        ]);
-
-        $this->assertAuthenticated();
-        $response->assertRedirect('/catalog');
-
-        $user = User::where('name', 'Fajar Pelanggan Baru')->first();
-        $this->assertNotNull($user);
-        $this->assertEquals('customer', $user->role);
-        $this->assertEquals('081298765432', $user->phone);
-        $this->assertStringContainsString('@customer.local', $user->email);
-    }
-
-    public function test_existing_customer_can_login_without_password(): void
-    {
-        $existing = User::where('role', 'customer')->first();
-
-        $response = $this->post('/login/customer', [
-            'name' => $existing->name,
-        ]);
-
-        $this->assertAuthenticatedAs($existing);
-        $response->assertRedirect('/catalog');
-    }
-
-    public function test_customer_login_fails_if_name_is_empty(): void
-    {
-        $response = $this->post('/login/customer', [
-            'name' => '',
-        ]);
-
-        $response->assertSessionHasErrors('name');
-        $this->assertGuest();
-    }
-
-    public function test_staff_portal_authenticates_staff_and_rejects_non_staff(): void
-    {
-        // 1. Staff valid can login
-        $staffResponse = $this->post('/login/staff', [
-            'email' => 'staff@electromart.test',
-            'password' => 'password123',
-        ]);
-        $this->assertAuthenticated();
-        $staffResponse->assertRedirect('/dashboard');
-
-        // Logout
-        $this->post('/logout');
-        $this->assertGuest();
-
-        // 2. Admin cannot login through staff portal
-        $adminResponse = $this->post('/login/staff', [
-            'email' => 'admin@electromart.test',
-            'password' => 'password123',
-        ]);
-        $this->assertGuest();
-        $adminResponse->assertSessionHasErrors('email');
-
-        // 3. Customer cannot login through staff portal
-        $customerResponse = $this->post('/login/staff', [
-            'email' => 'customer@electromart.test',
-            'password' => 'password123',
-        ]);
-        $this->assertGuest();
-        $customerResponse->assertSessionHasErrors('email');
-    }
-
-    public function test_admin_portal_authenticates_admin_and_rejects_non_admin(): void
-    {
-        // 1. Admin valid can login
-        $adminResponse = $this->post('/login/admin', [
+        // 1. Admin login redirects to dashboard
+        $adminResponse = $this->post('/login', [
             'email' => 'admin@electromart.test',
             'password' => 'password123',
         ]);
         $this->assertAuthenticated();
         $adminResponse->assertRedirect('/dashboard');
 
-        // Logout
         $this->post('/logout');
-        $this->assertGuest();
 
-        // 2. Staff cannot login through admin portal
-        $staffResponse = $this->post('/login/admin', [
+        // 2. Staff login redirects to dashboard
+        $staffResponse = $this->post('/login', [
             'email' => 'staff@electromart.test',
             'password' => 'password123',
         ]);
-        $this->assertGuest();
-        $staffResponse->assertSessionHasErrors('email');
+        $this->assertAuthenticated();
+        $staffResponse->assertRedirect('/dashboard');
 
-        // 3. Customer cannot login through admin portal
-        $customerResponse = $this->post('/login/admin', [
+        $this->post('/logout');
+
+        // 3. Customer login redirects to catalog
+        $customerResponse = $this->post('/login', [
             'email' => 'customer@electromart.test',
             'password' => 'password123',
         ]);
+        $this->assertAuthenticated();
+        $customerResponse->assertRedirect('/catalog');
+    }
+
+    public function test_guest_can_checkout_from_catalog_passwordless(): void
+    {
+        $product = \App\Models\Product::first();
+
+        $response = $this->post('/catalog/checkout', [
+            'customer_name' => 'Budi Pelanggan Langsung',
+            'customer_phone' => '081288887777',
+            'items' => [
+                [
+                    'product_id' => $product->id,
+                    'quantity' => 1,
+                ],
+            ],
+        ]);
+
+        $this->assertAuthenticated();
+        $user = User::where('name', 'Budi Pelanggan Langsung')->first();
+        $this->assertNotNull($user);
+        $this->assertEquals('customer', $user->role);
+        $this->assertEquals('081288887777', $user->phone);
+
+        $sale = \App\Models\Sale::where('customer_id', $user->id)->first();
+        $this->assertNotNull($sale);
+        $response->assertRedirect(route('sales.show', $sale));
+    }
+
+    public function test_guest_checkout_requires_customer_name(): void
+    {
+        $product = \App\Models\Product::first();
+
+        $response = $this->post('/catalog/checkout', [
+            'customer_name' => '',
+            'items' => [
+                [
+                    'product_id' => $product->id,
+                    'quantity' => 1,
+                ],
+            ],
+        ]);
+
+        $response->assertSessionHasErrors('customer_name');
         $this->assertGuest();
-        $customerResponse->assertSessionHasErrors('email');
     }
 }

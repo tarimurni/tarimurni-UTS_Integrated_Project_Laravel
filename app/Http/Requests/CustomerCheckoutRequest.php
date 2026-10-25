@@ -11,7 +11,7 @@ class CustomerCheckoutRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user() && $this->user()->isCustomer();
+        return ! auth()->check() || auth()->user()->isCustomer();
     }
 
     /**
@@ -21,10 +21,16 @@ class CustomerCheckoutRequest extends FormRequest
      */
     public function rules(): array
     {
+        $hasAuth = auth()->check();
+
         return [
             'items' => ['required', 'array', 'min:1'],
             'items.*.product_id' => ['required', 'distinct', 'exists:products,id'],
             'items.*.quantity' => ['required', 'integer', 'min:1'],
+            'customer_name' => [$hasAuth ? 'nullable' : 'required_without:name', 'string', 'max:150'],
+            'name' => ['nullable', 'string', 'max:150'],
+            'customer_phone' => ['nullable', 'string', 'max:30'],
+            'phone' => ['nullable', 'string', 'max:30'],
         ];
     }
 
@@ -42,6 +48,7 @@ class CustomerCheckoutRequest extends FormRequest
             'items.*.quantity.required' => 'Kuantitas pesanan wajib diisi.',
             'items.*.quantity.integer' => 'Kuantitas pesanan harus berupa bilangan bulat.',
             'items.*.quantity.min' => 'Kuantitas pesanan minimal 1 unit.',
+            'customer_name.required_without' => 'Nama Pelanggan wajib diisi untuk memproses pesanan.',
         ];
     }
 }

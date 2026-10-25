@@ -15,9 +15,13 @@
                     <p class="text-secondary mb-0">Temukan berbagai pilihan perangkat elektronik resmi: Smart TV, Kulkas, AC, Mesin Cuci, Laptop, dan Smartphone dengan tampilan warna asli serta stok real-time.</p>
                 </div>
                 <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                    <a href="{{ route('customer.orders') }}" class="btn btn-outline-light btn-sm">
-                        <i class="bi bi-clock-history me-1"></i> Riwayat Pesanan Saya
-                    </a>
+                    @auth
+                        @if(Auth::user()->isCustomer())
+                            <a href="{{ route('customer.orders') }}" class="btn btn-outline-light btn-sm">
+                                <i class="bi bi-clock-history me-1"></i> Riwayat Pesanan Saya
+                            </a>
+                        @endif
+                    @endauth
                 </div>
             </div>
         </div>
@@ -155,6 +159,46 @@
                         </div>
                         <div class="small text-muted" style="font-size: 0.75rem;">
                             <i class="bi bi-info-circle me-1"></i>Harga sudah termasuk PPN & garansi resmi.
+                        </div>
+                    </div>
+
+                    <!-- Customer Information for Order -->
+                    <div class="p-3 mb-3 bg-light rounded-3 border">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <h6 class="fw-bold text-dark small mb-0">
+                                <i class="bi bi-person-fill text-primary me-1"></i> Data Pembeli
+                            </h6>
+                            @guest
+                                <span class="badge bg-success-subtle text-success border border-success-subtle" style="font-size: 0.65rem;">Tanpa Login</span>
+                            @endguest
+                        </div>
+
+                        <div class="mb-2">
+                            <label for="customer_name" class="form-label small fw-semibold text-secondary mb-1">
+                                Nama Pelanggan <span class="text-danger">*</span>
+                            </label>
+                            <input type="text"
+                                   name="customer_name"
+                                   id="customer_name"
+                                   class="form-control form-control-sm @error('customer_name') is-invalid @enderror"
+                                   placeholder="Contoh: Andi Pratama"
+                                   value="{{ old('customer_name', Auth::check() ? Auth::user()->name : '') }}"
+                                   required>
+                            @error('customer_name')
+                                <div class="invalid-feedback small">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div>
+                            <label for="customer_phone" class="form-label small fw-semibold text-secondary mb-1">
+                                Nomor HP / WhatsApp <span class="text-muted fw-normal">(Opsional)</span>
+                            </label>
+                            <input type="text"
+                                   name="customer_phone"
+                                   id="customer_phone"
+                                   class="form-control form-control-sm @error('customer_phone') is-invalid @enderror"
+                                   placeholder="0812xxxx (Opsional)"
+                                   value="{{ old('customer_phone', Auth::check() ? Auth::user()->phone : '') }}">
                         </div>
                     </div>
 

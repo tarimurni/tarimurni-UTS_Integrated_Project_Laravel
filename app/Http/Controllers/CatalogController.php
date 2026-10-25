@@ -56,11 +56,57 @@ class CatalogController extends Controller
     }
 
     /**
-     * Process customer checkout from catalog.
+     * Process customer checkout from catalog (supports both guest and authenticated customers).
      */
     public function checkout(CustomerCheckoutRequest $request): RedirectResponse
     {
+        /** @var \App\Models\User|null $user */
         $user = Auth::user();
+
+        // If guest, find or create customer record using name and phone
+        if (! $user) {
+            $name = trim($request->input('customer_name') ?? $request->input('name') ?? '');
+            $phone = trim($request->input('customer_phone') ?? $request->input('phone') ?? '') ?: null;
+
+            if (empty($name)) {
+                return back()->withErrors(['customer_name' => 'Nama Pelanggan wajib diisi untuk memproses pesanan.'])->withInput();
+            }
+
+            // Find existing customer by name/phone or create a new passwordless record
+            $customer = \App\Models\User::where('role', 'customer')
+                ->where(function ($query) use ($name, $phone) {
+                    $query->where('name', $name);
+                    if (! empty($phone)) {
+                        $query->orWhere('phone', $phone);
+                    }
+                })
+                ->first();
+
+            if (! $customer) {
+                $slug = \Illuminate\Support\Str::slug($name);
+                if (empty($slug)) {
+                    $slug = 'pelanggan';
+                }
+                $randomSuffix = strtolower(\Illuminate\Support\Str::random(6));
+                $email = "{$slug}_{$randomSuffix}@customer.local";
+
+                $customer = \App\Models\User::create([
+                    'name' => $name,
+                    'email' => $email,
+                    'password' => \Illuminate\Support\Facades\Hash::make(\Illuminate\Support\Str::random(24)),
+                    'role' => 'customer',
+                    'phone' => $phone,
+                ]);
+            } else {
+                if (! empty($phone) && empty($customer->phone)) {
+                    $customer->update(['phone' => $phone]);
+                }
+            }
+
+            Auth::login($customer, true);
+            $request->session()->regenerate();
+            $user = $customer;
+        }
 
         try {
             $sale = $this->saleService->createSale(
