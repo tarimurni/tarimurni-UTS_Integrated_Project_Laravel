@@ -181,7 +181,7 @@
                                    name="customer_name"
                                    id="customer_name"
                                    class="form-control form-control-sm @error('customer_name') is-invalid @enderror"
-                                   placeholder="Contoh: Andi Pratama"
+                                   placeholder="Contoh: Rahmania"
                                    value="{{ old('customer_name', Auth::check() ? Auth::user()->name : '') }}"
                                    required>
                             @error('customer_name')
