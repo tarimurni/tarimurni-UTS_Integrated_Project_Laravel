@@ -84,7 +84,9 @@
                                     <td>
                                         @if($sale->customer)
                                             <div class="fw-semibold text-dark"><i class="bi bi-person-fill text-success me-1"></i>{{ $sale->customer->name }}</div>
-                                            <div class="small text-muted">{{ $sale->customer->email }}</div>
+                                            @if(!empty($sale->customer->email) && !str_ends_with(strtolower($sale->customer->email), '@customer.local'))
+                                                <div class="small text-muted">{{ $sale->customer->email }}</div>
+                                            @endif
                                         @else
                                             <span class="badge bg-light text-secondary border">Pembeli Umum (Walk-in)</span>
                                         @endif

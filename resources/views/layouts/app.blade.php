@@ -105,6 +105,80 @@
             color: #64748b;
             font-size: 0.875rem;
         }
+
+        @page {
+            size: A4 portrait;
+            margin: 10mm;
+        }
+
+        @media print {
+            nav,
+            .navbar,
+            footer,
+            .footer,
+            .sidebar,
+            #sidebar,
+            .d-print-none,
+            .btn,
+            .alert-dismissible {
+                display: none !important;
+            }
+
+            body {
+                background: #ffffff !important;
+                background-color: #ffffff !important;
+                color: #0f172a !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            body,
+            main,
+            main.container,
+            .main-content,
+            .container,
+            .container-fluid,
+            .row,
+            [class*="col-"],
+            .card {
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: 0 !important;
+                margin: 0 !important;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+                border: none !important;
+                overflow: visible !important;
+                background: transparent !important;
+            }
+
+            .table-responsive {
+                overflow: visible !important;
+                display: block !important;
+                width: 100% !important;
+            }
+
+            table,
+            .table {
+                width: 100% !important;
+                max-width: 100% !important;
+                table-layout: auto !important;
+                border-collapse: collapse !important;
+                font-size: 11.5px !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+
+            .card,
+            table,
+            .table,
+            tr {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+        }
     </style>
     @stack('styles')
 </head>

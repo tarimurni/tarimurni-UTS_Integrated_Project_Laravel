@@ -11,9 +11,14 @@
                     <h5 class="fw-bold mb-1 text-dark"><i class="bi bi-clock-history text-primary me-2"></i>Riwayat Pesanan Elektronik Saya</h5>
                     <p class="text-muted small mb-0">Daftar transaksi dan struk belanja resmi akun Anda di ElectroMart</p>
                 </div>
-                <a href="{{ route('catalog.index') }}" class="btn btn-primary btn-sm px-3">
-                    <i class="bi bi-bag-plus me-1"></i> Belanja Lagi
-                </a>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-outline-secondary btn-sm d-print-none" onclick="window.print()">
+                        <i class="bi bi-printer me-1"></i> Cetak Riwayat
+                    </button>
+                    <a href="{{ route('catalog.index') }}" class="btn btn-primary btn-sm px-3 d-print-none">
+                        <i class="bi bi-bag-plus me-1"></i> Belanja Lagi
+                    </a>
+                </div>
             </div>
 
             <div class="card-body px-4 pt-0">
@@ -27,7 +32,7 @@
                                 <th>Detail Produk</th>
                                 <th class="text-end">Total Pembayaran</th>
                                 <th class="text-center" style="width: 140px;">Status Pesanan</th>
-                                <th class="text-end" style="width: 120px;">Aksi</th>
+                                <th class="text-end d-print-none" style="width: 120px;">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -66,7 +71,7 @@
                                             </span>
                                         @endif
                                     </td>
-                                    <td class="text-end">
+                                    <td class="text-end d-print-none">
                                         <a href="{{ route('sales.show', $order) }}" class="btn btn-outline-secondary btn-sm" title="Lihat Struk / Invoice">
                                             <i class="bi bi-receipt me-1"></i> Struk
                                         </a>
@@ -77,7 +82,7 @@
                                     <td colspan="7" class="text-center py-5 text-muted">
                                         <i class="bi bi-bag-x fs-1 d-block mb-2 text-secondary"></i>
                                         Belum ada riwayat pesanan yang pernah Anda lakukan.<br>
-                                        <a href="{{ route('catalog.index') }}" class="btn btn-primary btn-sm mt-3">
+                                        <a href="{{ route('catalog.index') }}" class="btn btn-primary btn-sm mt-3 d-print-none">
                                             <i class="bi bi-cart3 me-1"></i> Mulai Belanja Sekarang
                                         </a>
                                     </td>
@@ -87,7 +92,7 @@
                     </table>
                 </div>
 
-                <div class="mt-4">
+                <div class="mt-4 d-print-none">
                     {{ $orders->links('pagination::bootstrap-5') }}
                 </div>
             </div>
