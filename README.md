@@ -11,77 +11,50 @@ Aplikasi sistem informasi pengelolaan persediaan barang (inventaris) dan transak
 
 ---
 
-## 📌 Daftar Isi
-- [Tentang Proyek & Fitur Utama](#-tentang-proyek--fitur-utama)
-- [Hak Akses Pengguna (3 Role)](#-hak-akses-pengguna-3-role)
-- [Spesifikasi & Persyaratan Sistem](#-spesifikasi--persyaratan-sistem)
-- [Panduan Instalasi & Konfigurasi (Reproducible Setup)](#-panduan-instalasi--konfigurasi-reproducible-setup)
-- [Akun Demo Pengujian](#-akun-demo-pengujian)
-- [Entity Relationship Diagram (ERD) & Relasi Database](#-entity-relationship-diagram-erd--relasi-database)
-- [Automated Feature Tests (8 Skenario Wajib UTS)](#-automated-feature-tests-8-skenario-wajib-uts)
-- [Screenshots Aplikasi & Bukti Pengujian](#-screenshots-aplikasi--bukti-pengujian)
-- [Batasan Sistem (Known Limitations)](#-batasan-sistem-known-limitations)
+## Daftar Isi (Deliverables UTS - Slide 20 PPT)
+
+1. [Project Overview](#1-project-overview)
+2. [Requirements](#2-requirements)
+3. [Installation (Langkah demi Langkah)](#3-installation-langkah-demi-langkah)
+4. [Environment Setup](#4-environment-setup)
+5. [Migration & Seeding](#5-migration--seeding)
+6. [Demo Account](#6-demo-account)
+7. [Features & Business Rules](#7-features--business-rules)
+8. [Entity Relationship Diagram (ERD) & Penjelasan Relasi](#8-entity-relationship-diagram-erd--penjelasan-relasi)
+9. [Screenshots Halaman Utama dan Transaksi](#9-screenshots-halaman-utama-dan-transaksi)
+10. [Test Cases dan Bukti Hasil Pengujian](#10-test-cases-dan-bukti-hasil-pengujian)
+11. [Known Limitations](#11-known-limitations)
 
 ---
 
-## 🚀 Tentang Proyek & Fitur Utama
+## 1. Project Overview
 
-**ElectroMart** dirancang untuk menjawab kebutuhan toko ritel dan distributor elektronik dalam mengotomatisasi pencatatan stok barang, restock dari supplier resmi, kasir kasir (POS), serta alur pemesanan mandiri oleh pelanggan (katalog & checkout).
+**ElectroMart** adalah sistem informasi manajemen inventaris dan transaksi penjualan ritel/distribusi elektronik yang dirancang untuk mengotomatisasi operasional toko secara menyeluruh. Sistem ini mengintegrasikan rantai pasok mulai dari pengadaan barang masuk (*stock-in*) dari pemasok resmi, pencatatan kasir Point of Sales (*POS*), hingga modul e-commerce mandiri (*self-service checkout*) untuk pelanggan dengan gerbang pembayaran digital interaktif **ElectroPay (Midtrans Snap)**.
 
-### Fitur Kunci Aplikasi:
-1. **Pembaruan Stok Otomatis & Atomik**:
-   - Transaksi **Pembelian (Stock-In)** dari distributor resmi otomatis menambah stok produk.
-   - Transaksi **Penjualan (Stock-Out)** via kasir POS maupun checkout online otomatis mengurangi stok produk.
-   - Menggunakan `DB::transaction` dan *pessimistic locking* (`Product::lockForUpdate()`) guna menjamin integritas data ACID (*Atomicity, Consistency, Isolation, Durability*) serta mencegah *race condition* dan *overselling*.
-2. **Integrasi Payment Gateway Interaktif (ElectroPay powered by Midtrans Snap)**:
-   - Dukungan kanal pembayaran multi-channel otomatis:
-     - **QRIS Instant (Scan QR)**: Standar nasional QRIS kompatibel dengan seluruh Mobile Banking (BCA, Mandiri, BRI, BSI) & E-Wallet (GoPay, OVO, DANA, ShopeePay) dengan identitas merchant resmi *"ELECTROMART OFFICIAL STORE"*.
-     - **Bank Virtual Account (VA)**: Nomor VA 16 digit terformat otomatis untuk Bank BCA (`80777...`), Bank BSI Syariah (`90012...`), dan Bank Mandiri (`88901...`) dilengkapi tombol *1-klik Salin Nomor VA* dan panduan transfer ATM/Mobile Banking.
-     - **E-Wallet Instant**: Simulasi push notification pembayaran via aplikasi dompet digital.
-     - **Tunai / Cash di Toko**: Transaksi kasir langsung (offline) di meja counter.
-   - Layar pembayaran interaktif (`/sales/{sale}/payment`) dan popup modal `#snapModal` dengan countdown timer 15 menit dan simulasi verifikasi lunas (*Callback Verifikasi Lunas*).
-   - Pencatatan otomatis nomor referensi payment gateway (`payment_reference`), metode pembayaran (`payment_method`), waktu lunas (`paid_at`), serta badge status `LUNAS (PAID)` pada struk nota.
-   - Mekanisme pembatalan (*cancel*): status pembayaran otomatis berubah menjadi `refunded` dan kuantitas produk dikembalikan ke gudang secara atomik.
-3. **Dashboard Agregat Real-Time**:
-   - Menghitung omset penjualan hari ini dan bulan ini, biaya pembelian barang masuk, jumlah produk aktif, serta 5 transaksi terakhir langsung dari database.
-   - Widget peringatan **Stok Barang Menipis (Low-Stock Alert)** menggunakan query `whereColumn('stock', '<=', 'minimum_stock')` dengan penanda visual status darurat.
-4. **Pencarian, Filter Lanjutan, & Pagination**:
-   - Pencarian berdasarkan SKU, nama produk, nomor invoice/PO.
-   - Filter dinamis berdasarkan kategori, status stok (Tersedia, Stok Rendah, Habis), serta rentang tanggal transaksi (`start_date` s/d `end_date`).
-   - Seluruh daftar menggunakan `paginate(10)->withQueryString()` agar kondisi filter tetap bertahan saat berpindah halaman.
-5. **Pembatalan Transaksi dengan Rollback Stok (Admin Only)**:
-   - Admin dapat membatalkan faktur penjualan (stok dikembalikan) atau pembelian (stok ditarik kembali dengan validasi kecukupan stok).
-6. **Isolasi Privasi Pelanggan**:
-   - Customer hanya dapat melihat dan mengakses riwayat pesanan serta struk/invoice milik akunnya sendiri.
+### Arsitektur & Teknologi:
+- **Framework Utama**: Laravel 12.x (arsitektur MVC & Service Layer)
+- **Bahasa Pemrograman**: PHP ^8.2 (Type hinting, constructor property promotion, match expressions)
+- **Database Engine**: MySQL 8.0+ / MariaDB 10.4+ (InnoDB engine dengan transaksi ACID)
+- **Frontend & Styling**: Blade Templating Engine, Bootstrap 5.3, Bootstrap Icons
+- **Pengujian Otomatis**: PHPUnit / Pest Test Framework (65 automated feature tests)
 
 ---
 
-## 👥 Hak Akses Pengguna (3 Role)
+## 2. Requirements
 
-Sistem mengamankan seluruh route di sisi server menggunakan *Role-Based Authorization Middleware* (`RoleMiddleware`):
+Pastikan perangkat komputer Anda telah memenuhi spesifikasi berikut sebelum menjalankan aplikasi:
 
-| Role | Hak Akses & Tanggung Jawab |
-|---|---|
-| 👑 **Admin** | Memiliki akses tertinggi: mengelola Master Data (CRUD Produk, Kategori, Supplier, dan Pengguna), mencatat pembelian & penjualan, membatalkan transaksi dengan mekanisme rollback stok, serta melihat statistik dashboard lengkap. |
-| 💼 **Staff** | Bertugas sebagai staf gudang dan kasir: membuka form Kasir POS (`/sales/create`), mencatat penerimaan barang masuk (`/purchases/create`), melihat katalog inventaris dan stok menipis. Ditolak HTTP 403 Forbidden pada aksi mutasi master data dan pembatalan transaksi. |
-| 🛍️ **Customer** | Pembeli umum terdaftar: menjelajahi Katalog Produk Elektronik (`/catalog`), melakukan checkout belanja keranjang multi-item mandiri, dan melihat daftar riwayat belanja serta struk resmi miliknya (`/customer/orders`). |
-
----
-
-## 💻 Spesifikasi & Persyaratan Sistem
-
-Pastikan perangkat Anda memenuhi syarat berikut sebelum instalasi:
-- **PHP**: Versi `^8.2` atau lebih baru (ekstensi aktif: `pdo_mysql`, `mbstring`, `openssl`, `tokenizer`, `xml`, `ctype`, `json`, `bcmath`).
-- **Composer**: Versi `^2.2` atau lebih baru.
-- **MySQL / MariaDB**: MySQL 8.0+ atau MariaDB 10.4+ (tersedia bawaan paket **XAMPP**).
-- **Web Server**: Apache XAMPP atau built-in server PHP (`php artisan serve`).
-- **Browser Modern**: Google Chrome, Mozilla Firefox, atau Microsoft Edge.
+- **PHP**: Versi `^8.2` atau lebih tinggi (ekstensi aktif: `pdo_mysql`, `mbstring`, `openssl`, `tokenizer`, `xml`, `ctype`, `json`, `bcmath`).
+- **Composer**: Versi `^2.2` atau lebih tinggi untuk manajemen dependensi PHP.
+- **MySQL / MariaDB**: MySQL 8.0+ atau MariaDB 10.4+ (disediakan oleh paket **XAMPP**).
+- **Web Server**: Apache XAMPP atau PHP Built-in Server (`php artisan serve`).
+- **Browser Modern**: Google Chrome, Mozilla Firefox, Microsoft Edge, atau Safari dengan dukungan JavaScript aktif.
 
 ---
 
-## 🛠️ Panduan Instalasi & Konfigurasi (Reproducible Setup)
+## 3. Installation (Langkah demi Langkah)
 
-Ikuti langkah-langkah di bawah ini secara berurutan untuk menjalankan proyek di komputer lokal:
+Ikuti langkah-langkah instalasi berikut secara berurutan:
 
 ### 1. Clone Repository
 Buka terminal (Git Bash / PowerShell), arahkan ke direktori web server (misalnya `C:/xampp/htdocs/`):
@@ -91,22 +64,42 @@ cd tarimurni-UTS_Integrated_Project_Laravel
 ```
 
 ### 2. Install Dependensi PHP
-Jalankan Composer untuk mengunduh seluruh library Laravel 12:
+Jalankan Composer untuk mengunduh seluruh dependensi Laravel 12:
 ```bash
 composer install
 ```
 
-### 3. Konfigurasi Environment File (`.env`)
-Salin file `.env.example` menjadi `.env`:
+### 3. Salin Environment File
+Salin file konfigurasi `.env.example` menjadi `.env`:
 ```bash
 cp .env.example .env
 ```
 
-Buka file `.env` dan pastikan konfigurasi database MySQL XAMPP telah sesuai:
+### 4. Generate Application Key
+Buat kunci enkripsi aplikasi:
+```bash
+php artisan key:generate
+```
+
+### 5. Jalankan Server Lokal
+Nyalakan server pengembangan lokal Laravel:
+```bash
+php artisan serve
+```
+Akses aplikasi melalui browser pada alamat: **[http://localhost:8000](http://localhost:8000)**
+
+---
+
+## 4. Environment Setup
+
+Pastikan modul **Apache** dan **MySQL** pada **XAMPP Control Panel** telah aktif.
+
+### Konfigurasi Database pada File `.env`:
+Buka file `.env` dan sesuaikan parameter koneksi database lokal Anda:
 ```env
 APP_NAME="ElectroMart Inventory & Sales"
 APP_ENV=local
-APP_KEY=
+APP_KEY=base64:...
 APP_DEBUG=true
 APP_TIMEZONE=Asia/Jakarta
 APP_URL=http://localhost:8000
@@ -119,47 +112,84 @@ DB_USERNAME=root
 DB_PASSWORD=
 ```
 
-### 4. Buat Database MySQL
-Buka **XAMPP Control Panel**, nyalakan modul **Apache** dan **MySQL**.  
-Buka browser dan buka **phpMyAdmin** (`http://localhost/phpmyadmin`) atau jalankan perintah SQL berikut:
+### Pembuatan Database MySQL:
+Buka **phpMyAdmin** (`http://localhost/phpmyadmin`) atau jalankan perintah SQL berikut di terminal:
 ```sql
 CREATE DATABASE IF NOT EXISTS db_uts_elektronik CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
-### 5. Generate Application Key
-Generate kunci enkripsi aplikasi Laravel:
-```bash
-php artisan key:generate
-```
+---
 
-### 6. Jalankan Migrations & Seeders
-Eksekusi migrasi skema tabel dan isi data awal (*dummy seed data*) produk elektronik:
+## 5. Migration & Seeding
+
+Jalankan perintah migrasi tabel dan seeding data awal dummy:
 ```bash
 php artisan migrate:fresh --seed
 ```
-*Perintah ini akan membuat 8 tabel relasional dan mengisinya dengan 4 user default, 5 kategori elektronik, 4 supplier, dan 15 produk elektronik realistis (termasuk 4 produk berkondisi stok rendah).*
 
-### 7. Jalankan Server Lokal
-Nyalakan local development server Laravel:
+Perintah ini akan membuat struktur tabel relasional berikut dan mengisinya dengan data seed:
+- `users`: Akun administrator, staff kasir, dan pelanggan.
+- `categories`: Kategori perangkat elektronik (Laptop, Smartphone, Audio, Aksesoris, Perangkat Cerdas).
+- `suppliers`: Data distributor resmi pemasok elektronik.
+- `products`: 15 produk elektronik realistis (lengkap dengan 4 produk berkondisi *low-stock* untuk verifikasi alert).
+- `purchases` & `purchase_items`: Riwayat transaksi pengadaan stok masuk.
+- `sales` & `sale_items`: Riwayat transaksi penjualan, nomor referensi payment gateway, dan rincian item.
+
+*(Opsional) Bersihkan cache view yang terkompilasi:*
 ```bash
-php artisan serve
+php artisan view:clear
 ```
-Akses aplikasi melalui browser di alamat: **[http://localhost:8000](http://localhost:8000)**
 
 ---
 
-## 🔑 Akun Demo Pengujian
+## 6. Demo Account
 
-| Role | Nama Akun | Email Login | Password | Akses URL Utama |
+Aplikasi menyediakan 4 akun default dengan hak akses bertingkat (*Role-Based Access Control*):
+
+| Role | Nama Pengguna | Email Login | Password | Hak Akses & URL Utama |
 | :--- | :--- | :--- | :--- | :--- |
-| **Admin** | **Salsa Callista** | `admin@electromart.test` | `password123` | `/dashboard`, `/products`, `/categories`, `/suppliers`, `/users`, `/purchases`, `/sales` |
-| **Staff** | **Ade Afrina** | `staff@electromart.test` | `password123` | `/dashboard`, `/sales/create`, `/purchases/create`, `/products` |
-| **Customer 1** | **Rahmania** | *(Tanpa Email)* | *(Tanpa Password)* | `/catalog`, `/customer/orders` (Langsung via Katalog & Nama Pelanggan) |
-| **Customer 2** | **Alfi Syahri** | *(Tanpa Email)* | *(Tanpa Password)* | `/catalog`, `/customer/orders` (Langsung via Katalog & Nama Pelanggan) |
+| 👑 **Admin** | **Salsa Callista** | `admin@electromart.test` | `password123` | Akses penuh: `/dashboard`, `/products`, `/categories`, `/suppliers`, `/users`, `/purchases`, `/sales` |
+| 💼 **Staff** | **Ade Afrina** | `staff@electromart.test` | `password123` | Kasir & Gudang: `/dashboard`, `/sales/create`, `/purchases/create`, `/products` (HTTP 403 pada mutasi master data) |
+| 🛍️ **Customer 1** | **Rahmania** | *(Akses Langsung)* | *(Tanpa Password)* | `/catalog`, `/customer/orders` (Katalog Mandiri & Checkout Pelanggan) |
+| 🛍️ **Customer 2** | **Alfi Syahri** | *(Akses Langsung)* | *(Tanpa Password)* | `/catalog`, `/customer/orders` (Katalog Mandiri & Checkout Pelanggan) |
 
 ---
 
-## 📊 Entity Relationship Diagram (ERD) & Relasi Database
+## 7. Features & Business Rules
+
+### 1. Pembaruan Stok Otomatis & Atomik (ACID):
+- Transaksi **Pembelian (Stock-In)** dari supplier resmi otomatis menambah nilai `stock` produk.
+- Transaksi **Penjualan (Stock-Out)** via kasir POS maupun checkout customer otomatis memotong nilai `stock` produk.
+- Menggunakan `DB::transaction` dan *pessimistic locking* (`Product::lockForUpdate()`) guna menjamin konsistensi ACID (*Atomicity, Consistency, Isolation, Durability*) serta mencegah *race condition* dan *overselling*.
+
+### 2. Integrasi Payment Gateway (ElectroPay powered by Midtrans Snap):
+- Mendukung kanal pembayaran digital multi-channel:
+  - **QRIS Instant (Scan QR)**: Standar Nasional QRIS yang kompatibel dengan seluruh Mobile Banking (BCA, Mandiri, BRI, BSI) & E-Wallet (GoPay, OVO, DANA, ShopeePay) dengan identitas merchant resmi *"ELECTROMART OFFICIAL STORE"*.
+  - **Bank Virtual Account (VA)**: Nomor VA 16 digit terformat otomatis untuk Bank BCA (`80777...`), Bank BSI Syariah (`90012...`), dan Bank Mandiri (`88901...`) disertai tombol *1-klik Salin Nomor VA* dan panduan transfer ATM/m-Banking.
+  - **E-Wallet Instant**: Simulasi push notification pembayaran via dompet digital.
+  - **Tunai / Cash di Toko**: Pembayaran kasir tunai offline di meja counter.
+- Layar pembayaran interaktif (`/sales/{sale}/payment`) dan Popup Modal `#snapModal` dengan countdown timer 15 menit dan verifikasi instan *Callback Verifikasi Lunas*.
+- Pencatatan nomor referensi unik (`payment_reference`), metode pembayaran (`payment_method`), waktu verifikasi lunas (`paid_at`), serta badge status `LUNAS (PAID)` pada struk nota.
+- Pembatalan transaksi (*cancel*) oleh Admin otomatis memperbarui status menjadi `refunded` dan kuantitas produk dikembalikan ke gudang secara atomik.
+
+### 3. Dashboard Agregat Real-Time & Peringatan Low-Stock:
+- Menghitung omset penjualan hari ini dan bulan ini, biaya pembelian barang masuk, jumlah produk aktif, serta 5 transaksi terakhir langsung dari database.
+- Widget peringatan **Stok Barang Menipis (Low-Stock Alert)** menggunakan query `whereColumn('stock', '<=', 'minimum_stock')` dengan penanda visual status darurat.
+
+### 4. Pencarian Cerdas, Filter Lanjutan, & Pagination:
+- Pencarian multi-parameter berdasarkan SKU, nama produk, nomor invoice/PO.
+- Filter dinamis berdasarkan kategori, status stok (Tersedia, Stok Rendah, Habis), serta rentang tanggal transaksi (`start_date` s/d `end_date`).
+- Seluruh daftar menggunakan `paginate(10)->withQueryString()` agar kondisi filter tetap bertahan saat berpindah halaman.
+
+### 5. Pembatalan Transaksi dengan Rollback Stok (Admin Only):
+- Admin memiliki hak khusus membatalkan faktur penjualan (stok dikembalikan) atau pembelian (stok ditarik kembali dengan validasi kecukupan stok).
+
+### 6. Isolasi Privasi Pelanggan (Customer Data Isolation):
+- Customer hanya dapat melihat dan mengakses riwayat pesanan serta struk/invoice milik akunnya sendiri (HTTP 403 Forbidden jika mengakses faktur milik orang lain).
+
+---
+
+## 8. Entity Relationship Diagram (ERD) & Penjelasan Relasi
 
 ### 1. Diagram Relasi Entitas (Mermaid ERD)
 
@@ -278,13 +308,13 @@ erDiagram
 
 #### Perbedaan `hasMany()` dan `belongsTo()`:
 - **`hasMany()` (Relasi One-to-Many dari sisi Induk / Parent)**:
-  - Dideklarasikan pada model induk yang tidak memiliki foreign key.
+  - Dideklarasikan pada model induk yang tidak memiliki foreign key secara fisik.
   - Menandakan bahwa satu record entitas induk dapat memiliki banyak record pada entitas anak.
-  - *Contoh*: `Category::hasMany(Product::class)` berarti satu kategori memiliki banyak produk. `Sale::hasMany(SaleItem::class)` berarti satu nomor faktur penjualan memiliki banyak rincian item produk yang dibeli.
+  - *Contoh*: `Category::hasMany(Product::class)` berarti satu kategori menaungi banyak produk. `Sale::hasMany(SaleItem::class)` berarti satu nomor faktur penjualan memiliki banyak rincian item produk yang dibeli.
 - **`belongsTo()` (Relasi Many-to-One dari sisi Anak / Child)**:
   - Dideklarasikan pada model anak yang secara fisik memegang kolom `foreign_key`.
   - Menandakan bahwa record anak tersebut merujuk kembali secara tunggal ke record induknya.
-  - *Contoh*: `Product::belongsTo(Category::class)` menyatakan bahwa produk tersebut wajib mengacu ke satu kategori tertentu. `SaleItem::belongsTo(Sale::class)` menyatakan rincian item tersebut merupakan bagian dari satu faktur penjualan.
+  - *Contoh*: `Product::belongsTo(Category::class)` menyatakan bahwa produk wajib mengacu ke satu kategori tertentu. `SaleItem::belongsTo(Sale::class)` menyatakan rincian item tersebut merupakan bagian dari satu faktur penjualan.
 
 #### Alasan Penempatan Foreign Key pada Tabel Detail (`purchase_items` & `sale_items`):
 1. **Normalisasi Database (Kaidah 1NF & 2NF)**:
@@ -296,41 +326,15 @@ erDiagram
 
 ---
 
-## 🧪 Automated Feature Tests (8 Skenario Wajib UTS)
+## 9. Screenshots Halaman Utama dan Transaksi
 
-Aplikasi dilengkapi pengujian otomatis menggunakan PHPUnit yang memverifikasi seluruh business rules sistem. File uji terpusat di `tests/Feature/InventorySalesSystemTest.php` mencakup 8 skenario wajib:
-
-| No | Skenario Pengujian | Hasil Uji | Deskripsi Validasi |
-|:---:|---|:---:|---|
-| **1** | **Authentication & Guest Protection** | `PASS` | Memastikan *guest* tidak dapat mengakses `/dashboard` (otomatis redirect ke `/login`) dan login dengan password salah ditolak dengan pesan error. |
-| **2** | **Product Validation** | `PASS` | Menolak pembuatan produk dengan SKU duplikat, harga beli/jual negatif, atau harga jual lebih rendah dari harga beli (`selling_price >= purchase_price`). |
-| **3** | **Purchase Stock-In** | `PASS` | Memastikan transaksi pembelian yang sukses otomatis menambah nilai `stock` produk secara akurat di database. |
-| **4** | **Sale Stock-Out** | `PASS` | Memastikan transaksi kasir oleh Staff maupun checkout mandiri oleh Customer otomatis memotong stok produk sesuai kuantitas yang dibeli. |
-| **5** | **Insufficient Stock Validation** | `PASS` | Menolak transaksi penjualan yang meminta kuantitas melebihi stok yang tersedia, dan memastikan nilai stok di database tidak berkurang. |
-| **6** | **Database Atomicity & Rollback** | `PASS` | Memverifikasi bahwa jika pada transaksi multi-item terdapat 1 item yang stoknya kurang, maka seluruh transaksi di-*rollback* (`sales` tidak tersimpan dan stok item pertama tidak berkurang). |
-| **7** | **Role-Based Authorization** | `PASS` | Memastikan pengguna dengan role `staff` dan `customer` menerima respons **HTTP 403 Forbidden** jika mencoba mengakses endpoint khusus `admin` (hapus produk, kelola kategori, kelola user). |
-| **8** | **Search, Filter, & Pagination** | `PASS` | Memverifikasi pencarian SKU dan filter kategori mengembalikan data akurat, serta query string tetap dipertahankan pada tautan paginasi (`withQueryString()`). |
-
-### Cara Menjalankan Automated Tests:
-```bash
-# Menjalankan seluruh test suite (65 tests, 264 assertions)
-php artisan test
-
-# Menjalankan khusus 8 skenario wajib UTS
-php artisan test --filter=InventorySalesSystemTest
-```
-
----
-
-## 📸 Screenshots Aplikasi & Bukti Pengujian
-
-Berikut adalah dokumentasi antarmuka aplikasi **ElectroMart** beserta bukti pengujian fungsionalitas dan validasi sistem:
+Berikut adalah dokumentasi antarmuka aplikasi **ElectroMart** beserta bukti alur transaksi, master data, dan penanganan error:
 
 ### 1. Halaman Autentikasi & Login Multi-Role
 Halaman masuk terpadu dengan autentikasi berbasis session, proteksi CSRF, deteksi role otomatis (Admin, Staff, Customer), serta tombol kredensial demo untuk pengujian cepat.
 ![Halaman Login](public/screenshots/tampilan%20login.png)
 
-### 2. Dashboard Admin & Peringatan Stok Menipis (Low-Stock Alert)
+### 2. Dashboard Admin Salsa Callista & Peringatan Low-Stock Alert
 Dashboard real-time administrator menampilkan metrik pendapatan hari ini, omset bulanan, pengeluaran restock, jumlah produk aktif, serta tabel peringatan darurat bagi produk yang stoknya berada di bawah batas minimum (`whereColumn('stock', '<=', 'minimum_stock')`).
 ![Dashboard Admin](public/screenshots/dashboard%20admin.png)
 
@@ -371,17 +375,48 @@ Validasi integritas inventaris yang menolak transaksi apabila kuantitas barang y
 ![Insufficient Stock Error State](public/screenshots/Insufficient%20stock%20error%20state.jpeg)
 
 ### 12. Bukti Hasil Pengujian Otomatis (Automated PHPUnit Tests)
-Hasil eksekusi pengujian otomatis `php artisan test` yang memvalidasi seluruh fungsionalitas sistem (autentikasi, otorisasi role, kalkulasi stok atomik, payment gateway, dan isolasi data) dengan status kelulusan **100% PASS (65 passed, 264 assertions)** tanpa error.
+Hasil eksekusi pengujian otomatis `php artisan test` yang memvalidasi seluruh fungsionalitas sistem (autentikasi, otorisasi role, kalkulasi stok atomik, payment gateway, dan isolasi data) dengan status kelulusan **100% PASS** tanpa error.
 ![Hasil Testing](public/screenshots/hasil%20testing.jpeg)
 
 ---
 
-## ⚠️ Batasan Sistem (Known Limitations)
+## 10. Test Cases dan Bukti Hasil Pengujian
+
+Aplikasi dilengkapi pengujian otomatis menggunakan PHPUnit yang memverifikasi seluruh business rules sistem. File uji terpusat di `tests/Feature/` mencakup seluruh skenario wajib UTS dan modul integrasi Payment Gateway:
+
+| No | Skenario Pengujian | Hasil Uji | Deskripsi Validasi |
+|:---:|---|:---:|---|
+| **1** | **Authentication & Guest Protection** | `PASS` | Memastikan *guest* tidak dapat mengakses `/dashboard` (otomatis redirect ke `/login`) dan login dengan password salah ditolak dengan pesan error. |
+| **2** | **Product Validation** | `PASS` | Menolak pembuatan produk dengan SKU duplikat, harga beli/jual negatif, atau harga jual lebih rendah dari harga beli (`selling_price >= purchase_price`). |
+| **3** | **Purchase Stock-In** | `PASS` | Memastikan transaksi pembelian yang sukses otomatis menambah nilai `stock` produk secara akurat di database. |
+| **4** | **Sale Stock-Out** | `PASS` | Memastikan transaksi kasir oleh Staff maupun checkout mandiri oleh Customer otomatis memotong stok produk sesuai kuantitas yang dibeli. |
+| **5** | **Insufficient Stock Validation** | `PASS` | Menolak transaksi penjualan yang meminta kuantitas melebihi stok yang tersedia, dan memastikan nilai stok di database tidak berkurang. |
+| **6** | **Database Atomicity & Rollback** | `PASS` | Memverifikasi bahwa jika pada transaksi multi-item terdapat 1 item yang stoknya kurang, maka seluruh transaksi di-*rollback* (`sales` tidak tersimpan dan stok item pertama tidak berkurang). |
+| **7** | **Role-Based Authorization** | `PASS` | Memastikan pengguna dengan role `staff` dan `customer` menerima respons **HTTP 403 Forbidden** jika mencoba mengakses endpoint khusus `admin` (hapus produk, kelola kategori, kelola user). |
+| **8** | **Search, Filter, & Pagination** | `PASS` | Memverifikasi pencarian SKU dan filter kategori mengembalikan data akurat, serta query string tetap dipertahankan pada tautan paginasi (`withQueryString()`). |
+| **9** | **Payment Gateway Integration** | `PASS` | Memvalidasi transaksi dengan QRIS, Virtual Account (BCA/BSI/Mandiri), dan E-Wallet menyimpan `payment_method`, `payment_reference`, dan `paid_at` secara otomatis. |
+| **10** | **Cancellation & Refund** | `PASS` | Memverifikasi pembatalan transaksi oleh Admin mengubah status pembayaran menjadi `refunded` dan mengembalikan stok barang ke inventaris. |
+
+### Perintah Menjalankan Automated Tests:
+```bash
+# Menjalankan seluruh test suite (65 tests, 264 assertions)
+php artisan test
+
+# Menjalankan khusus skenario wajib UTS
+php artisan test --filter=InventorySalesSystemTest
+```
+
+### Bukti Screenshot Hasil Pengujian Otomatis (`php artisan test`):
+![Hasil Pengujian Otomatis](public/screenshots/hasil%20testing.jpeg)
+
+---
+
+## 11. Known Limitations
 
 Sesuai ruang lingkup dan batasan proyek Ujian Tengah Semester (UTS):
 1. **Payment Gateway Simulator (ElectroPay / Midtrans Snap)**:
    Telah terintegrasi simulator gerbang pembayaran multi-channel (QRIS Standar Nasional, Virtual Account BCA/BSI/Mandiri, E-Wallet, dan Tunai Kasir) dengan mekanisme *callback* instan tanpa memerlukan credentials production berbayar.
-2. **Tanpa Integrasi API Ekspedisi**:
+2. **Tanpa Integrasi API Ekspedisi Logistik**:
    Sistem pengiriman produk belum terhubung dengan kalkulator ongkos kirim real-time (seperti RajaOngkir).
 3. **Single Warehouse Inventory**:
    Manajemen persediaan barang diasumsikan berada pada satu gudang fisik terpusat (*single-warehouse*), belum mendukung multi-cabang atau pencatatan nomor seri unik (*Serial Number/IMEI*) per unit barang.
