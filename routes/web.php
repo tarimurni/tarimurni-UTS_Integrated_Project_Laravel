@@ -27,6 +27,10 @@ Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 
+    // Portal Login for Backoffice
+    Route::get('/portal/login', [AuthController::class, 'showPortalLoginForm'])->name('portal.login');
+    Route::post('/portal/login', [AuthController::class, 'login'])->name('portal.login.post');
+
     Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
     Route::post('/register', [AuthController::class, 'register'])->name('register.post');
 });

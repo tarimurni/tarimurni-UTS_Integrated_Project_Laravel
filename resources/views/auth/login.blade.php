@@ -39,7 +39,7 @@
 
                 <!-- Input Password -->
                 <div class="mb-3">
-                    <label for="password" class="form-label fw-semibold small text-secondary">Password</label>
+                    <label for="password" class="form-label fw-semibold small text-secondary">Kata Sandi</label>
                     <div class="input-group">
                         <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-lock"></i></span>
                         <input type="password"
@@ -47,22 +47,22 @@
                                id="password"
                                name="password"
                                required
-                               placeholder="Kata sandi akun">
+                               placeholder="Masukkan kata sandi Anda">
                     </div>
                     @error('password')
                         <div class="invalid-feedback d-block small mt-1">{{ $message }}</div>
                     @enderror
                 </div>
 
-                <!-- Checkbox Ingat Saya -->
+                <!-- Checkbox Ingat Sesi Saya -->
                 <div class="mb-4 form-check">
                     <input type="checkbox" class="form-check-input" id="remember" name="remember" value="1">
-                    <label class="form-check-label small text-muted" for="remember">Ingat Saya</label>
+                    <label class="form-check-label small text-muted" for="remember">Ingat sesi saya</label>
                 </div>
 
-                <!-- Tombol Masuk Biru Penuh -->
+                <!-- Tombol Masuk ke Backoffice -->
                 <button type="submit" class="btn btn-primary w-100 py-2 fs-6 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2">
-                    <i class="bi bi-box-arrow-in-right"></i> Masuk
+                    <i class="bi bi-box-arrow-in-right"></i> Masuk ke Backoffice
                 </button>
             </form>
 

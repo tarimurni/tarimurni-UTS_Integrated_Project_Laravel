@@ -28,8 +28,21 @@ class AuthAndRoleTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Masuk ke ElectroMart');
         $response->assertSee('Email');
-        $response->assertSee('Password');
-        $response->assertSee('Ingat Saya');
+        $response->assertSee('Kata Sandi');
+        $response->assertSee('Ingat sesi saya');
+        $response->assertSee('Masuk ke Backoffice');
+        $response->assertSee('Kembali ke Katalog Toko');
+    }
+
+    public function test_portal_login_screen_can_be_rendered(): void
+    {
+        $response = $this->get('/portal/login');
+        $response->assertStatus(200);
+        $response->assertSee('Portal Backoffice');
+        $response->assertSee('Email');
+        $response->assertSee('Kata Sandi');
+        $response->assertSee('Ingat sesi saya');
+        $response->assertSee('Masuk ke Backoffice');
         $response->assertSee('Kembali ke Katalog Toko');
     }
 
@@ -46,7 +59,7 @@ class AuthAndRoleTest extends TestCase
 
         $response = $this->post('/login', [
             'email' => $user->email,
-            'password' => 'password123',
+            'password' => 'admin123',
         ]);
 
         $this->assertAuthenticated();
@@ -159,7 +172,7 @@ class AuthAndRoleTest extends TestCase
         // 1. Admin login redirects to dashboard
         $adminResponse = $this->post('/login', [
             'email' => 'admin@electromart.test',
-            'password' => 'password123',
+            'password' => 'admin123',
         ]);
         $this->assertAuthenticated();
         $adminResponse->assertRedirect('/dashboard');
@@ -169,7 +182,7 @@ class AuthAndRoleTest extends TestCase
         // 2. Staff login redirects to dashboard
         $staffResponse = $this->post('/login', [
             'email' => 'staff@electromart.test',
-            'password' => 'password123',
+            'password' => 'staff123',
         ]);
         $this->assertAuthenticated();
         $staffResponse->assertRedirect('/dashboard');
@@ -178,11 +191,50 @@ class AuthAndRoleTest extends TestCase
 
         // 3. Customer login redirects to catalog
         $customerResponse = $this->post('/login', [
-            'email' => 'rahmania@customer.local',
+            'email' => 'customer@electromart.test',
             'password' => 'customer123',
         ]);
         $this->assertAuthenticated();
         $customerResponse->assertRedirect('/catalog');
+    }
+
+    public function test_staff_cannot_login_using_staff_password_to_admin_account(): void
+    {
+        $this->post('/login', [
+            'email' => 'admin@electromart.test',
+            'password' => 'staff123',
+        ]);
+        $this->assertGuest();
+    }
+
+    public function test_admin_cannot_login_using_admin_password_to_staff_account(): void
+    {
+        $this->post('/login', [
+            'email' => 'staff@electromart.test',
+            'password' => 'admin123',
+        ]);
+        $this->assertGuest();
+    }
+
+    public function test_login_screens_do_not_contain_quick_login_or_password_leaks(): void
+    {
+        $loginResponse = $this->get('/login');
+        $loginResponse->assertDontSee('Akses Cepat');
+        $loginResponse->assertDontSee('1-Klik Masuk Cepat');
+        $loginResponse->assertDontSee('Pass:');
+        $loginResponse->assertDontSee('admin123');
+        $loginResponse->assertDontSee('staff123');
+        $loginResponse->assertDontSee('customer123');
+        $loginResponse->assertDontSee('password123');
+
+        $portalResponse = $this->get('/portal/login');
+        $portalResponse->assertDontSee('Akses Cepat');
+        $portalResponse->assertDontSee('1-Klik Masuk Cepat');
+        $portalResponse->assertDontSee('Pass:');
+        $portalResponse->assertDontSee('admin123');
+        $portalResponse->assertDontSee('staff123');
+        $portalResponse->assertDontSee('customer123');
+        $portalResponse->assertDontSee('password123');
     }
 
     public function test_guest_can_checkout_from_catalog_passwordless(): void

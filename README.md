@@ -3,7 +3,7 @@
 [![Laravel 12](https://img.shields.io/badge/Laravel-12.x-FF2D20?style=flat&logo=laravel&logoColor=white)](https://laravel.com)
 [![PHP Version](https://img.shields.io/badge/PHP-%3E%3D8.2-777BB4?style=flat&logo=php&logoColor=white)](https://www.php.net)
 [![Database](https://img.shields.io/badge/MySQL-XAMPP-4479A1?style=flat&logo=mysql&logoColor=white)](https://www.apachefriends.org)
-[![PHPUnit Tests](https://img.shields.io/badge/Tests-65%20Passed-success?style=flat&logo=phpunit&logoColor=white)](https://phpunit.de)
+[![PHPUnit Tests](https://img.shields.io/badge/Tests-69%20Passed-success?style=flat&logo=phpunit&logoColor=white)](https://phpunit.de)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 Proyek Ujian Tengah Semester (UTS) Mata Kuliah **Pemrograman Web**.  
@@ -36,7 +36,7 @@ Aplikasi sistem informasi pengelolaan persediaan barang (inventaris) dan transak
 - **Bahasa Pemrograman**: PHP ^8.2 (Type hinting, constructor property promotion, match expressions)
 - **Database Engine**: MySQL 8.0+ / MariaDB 10.4+ (InnoDB engine dengan transaksi ACID)
 - **Frontend & Styling**: Blade Templating Engine, Bootstrap 5.3, Bootstrap Icons
-- **Pengujian Otomatis**: PHPUnit / Pest Test Framework (65 automated feature tests)
+- **Pengujian Otomatis**: PHPUnit / Pest Test Framework (69 automated feature tests)
 
 ---
 
@@ -144,14 +144,20 @@ php artisan view:clear
 
 ## 6. Demo Account
 
-Aplikasi menyediakan 4 akun default dengan hak akses bertingkat (*Role-Based Access Control*):
+Aplikasi menyediakan akun default dengan hak akses bertingkat (*Role-Based Access Control*). Sesuai dengan standar keamanan sistem produksi dan ketentuan **Slide 20 PPT UTS**, seluruh kredensial akun demo **hanya dicantumkan di dokumentasi README.md ini** dan **tidak dibocorkan / tidak ditampilkan pada antarmuka halaman login**:
 
 | Role | Nama Pengguna | Email Login | Password | Hak Akses & URL Utama |
 | :--- | :--- | :--- | :--- | :--- |
-| 👑 **Admin** | **Salsa Callista** | `admin@electromart.test` | `password123` | Akses penuh: `/dashboard`, `/products`, `/categories`, `/suppliers`, `/users`, `/purchases`, `/sales` |
-| 💼 **Staff** | **Ade Afrina** | `staff@electromart.test` | `password123` | Kasir & Gudang: `/dashboard`, `/sales/create`, `/purchases/create`, `/products` (HTTP 403 pada mutasi master data) |
-| 🛍️ **Customer 1** | **Rahmania** | *(Akses Langsung)* | *(Tanpa Password)* | `/catalog`, `/customer/orders` (Katalog Mandiri & Checkout Pelanggan) |
-| 🛍️ **Customer 2** | **Alfi Syahri** | *(Akses Langsung)* | *(Tanpa Password)* | `/catalog`, `/customer/orders` (Katalog Mandiri & Checkout Pelanggan) |
+| 👑 **Admin Owner** | **Salsa Callista** | `admin@electromart.test` | `admin123` | Akses penuh: `/dashboard`, `/products`, `/categories`, `/suppliers`, `/users`, `/purchases`, `/sales` |
+| 💼 **Staff Kasir/Gudang** | **Ade Afrina** | `staff@electromart.test` | `staff123` | Kasir POS & Gudang: `/dashboard`, `/sales/create`, `/purchases/create`, `/products` (HTTP 403 mutasi master data) |
+| 🛍️ **Customer Demo** | **Customer Demo** | `customer@electromart.test` | `customer123` | Pelanggan Toko: `/catalog`, `/customer/orders` (Katalog Mandiri & Checkout) |
+| 🛍️ **Customer 1** | **Rahmania** | `rahmania@customer.local` | `customer123` | Pelanggan Toko: `/catalog`, `/customer/orders` (Katalog Mandiri & Checkout) |
+| 🛍️ **Customer 2** | **Alfi Syahri** | `alfisyahri@customer.local` | `customer123` | Pelanggan Toko: `/catalog`, `/customer/orders` (Katalog Mandiri & Checkout) |
+
+> [!NOTE]
+> **Peningkatan Keamanan Autentikasi (Sesuai Syarat Slide 20 PPT Dosen):**
+> 1. **Pemisahan Kata Sandi Antar-Peran**: Setiap role memiliki kata sandi berbeda (`admin123`, `staff123`, `customer123`) sehingga mencegah eskalasi hak akses antar role (Staff tidak dapat login ke akun Admin).
+> 2. **Pembersihan Bocoran Kredensial**: Seluruh tombol *1-klik auto-login* dan teks bocoran password pada form login (`/login` & `/portal/login`) telah dihapus secara total layaknya sistem produksi nyata.
 
 ---
 

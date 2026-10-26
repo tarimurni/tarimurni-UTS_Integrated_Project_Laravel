@@ -26,6 +26,20 @@ class AuthController extends Controller
     }
 
     /**
+     * Show clean backoffice portal login form.
+     */
+    public function showPortalLoginForm(): View|RedirectResponse
+    {
+        if (Auth::check()) {
+            return Auth::user()->isCustomer()
+                ? redirect()->route('catalog.index')
+                : redirect()->route('dashboard');
+        }
+
+        return view('auth.portal-login');
+    }
+
+    /**
      * Handle login authentication with automatic role detection.
      */
     public function login(Request $request): RedirectResponse

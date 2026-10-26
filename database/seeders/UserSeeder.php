@@ -17,7 +17,7 @@ class UserSeeder extends Seeder
             [
                 'name' => 'Salsa Callista',
                 'email' => 'admin@electromart.test',
-                'password' => Hash::make('password123'),
+                'password' => Hash::make('admin123'),
                 'role' => 'admin',
                 'phone' => '08116800101',
                 'address' => 'Jl. Surya Kencana No. 45, Jakarta Barat',
@@ -26,10 +26,19 @@ class UserSeeder extends Seeder
             [
                 'name' => 'Ade Afrina',
                 'email' => 'staff@electromart.test',
-                'password' => Hash::make('password123'),
+                'password' => Hash::make('staff123'),
                 'role' => 'staff',
                 'phone' => '08116800102',
                 'address' => 'Jl. Kebon Jeruk No. 18, Jakarta Barat',
+                'email_verified_at' => now(),
+            ],
+            [
+                'name' => 'Customer Demo',
+                'email' => 'customer@electromart.test',
+                'password' => Hash::make('customer123'),
+                'role' => 'customer',
+                'phone' => '08126900200',
+                'address' => 'Jl. Sudirman No. 12, Jakarta Pusat',
                 'email_verified_at' => now(),
             ],
             [
