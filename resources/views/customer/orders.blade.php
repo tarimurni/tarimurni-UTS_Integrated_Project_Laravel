@@ -30,7 +30,7 @@
                                 <th>No. Invoice</th>
                                 <th>Tanggal Pesanan</th>
                                 <th>Detail Produk</th>
-                                <th class="text-end">Total Pembayaran</th>
+                                <th class="text-end" style="white-space: nowrap;">Total Pembayaran</th>
                                 <th class="text-center" style="width: 140px;">Status Pesanan</th>
                                 <th class="text-end d-print-none" style="width: 120px;">Aksi</th>
                             </tr>
@@ -57,7 +57,7 @@
                                             @endif
                                         </div>
                                     </td>
-                                    <td class="text-end fw-bold text-success">
+                                    <td class="text-end fw-bold text-success" style="white-space: nowrap;">
                                         Rp {{ number_format($order->total, 0, ',', '.') }}
                                     </td>
                                     <td class="text-center">

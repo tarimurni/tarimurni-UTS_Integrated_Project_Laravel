@@ -106,6 +106,46 @@
             font-size: 0.875rem;
         }
 
+        /* Invoice Table Modern Utility */
+        .invoice-table {
+            border-collapse: collapse !important;
+            width: 100% !important;
+        }
+
+        .invoice-table thead th {
+            background-color: #f8fafc !important;
+            color: #475569;
+            font-weight: 600;
+            font-size: 0.825rem;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+            border-top: 1px solid #e2e8f0 !important;
+            border-bottom: 2px solid #e2e8f0 !important;
+            border-left: none !important;
+            border-right: none !important;
+            padding: 10px 14px !important;
+            vertical-align: middle !important;
+        }
+
+        .invoice-table tbody td {
+            padding: 10px 14px !important;
+            vertical-align: middle !important;
+            border-top: none !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+            border-left: none !important;
+            border-right: none !important;
+        }
+
+        .invoice-table tfoot td {
+            padding: 12px 14px !important;
+            vertical-align: middle !important;
+            background-color: #f8fafc !important;
+            border-top: 2px solid #e2e8f0 !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+            border-left: none !important;
+            border-right: none !important;
+        }
+
         @page {
             size: A4 portrait;
             margin: 10mm;

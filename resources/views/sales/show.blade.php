@@ -9,6 +9,47 @@
         margin: 10mm;
     }
 
+    /* Desain Tabel Invoice Modern & Bersih (Tanpa garis vertikal kaku) */
+    .invoice-table {
+        border-collapse: collapse !important;
+        width: 100% !important;
+        background-color: #ffffff;
+    }
+
+    .invoice-table thead th {
+        background-color: #f8fafc !important;
+        color: #475569;
+        font-weight: 600;
+        font-size: 0.825rem;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+        border-top: 1px solid #e2e8f0 !important;
+        border-bottom: 2px solid #e2e8f0 !important;
+        border-left: none !important;
+        border-right: none !important;
+        padding: 10px 14px !important;
+        vertical-align: middle !important;
+    }
+
+    .invoice-table tbody td {
+        padding: 10px 14px !important;
+        vertical-align: middle !important;
+        border-top: none !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+        border-left: none !important;
+        border-right: none !important;
+    }
+
+    .invoice-table tfoot td {
+        padding: 12px 14px !important;
+        vertical-align: middle !important;
+        background-color: #f8fafc !important;
+        border-top: 2px solid #e2e8f0 !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+        border-left: none !important;
+        border-right: none !important;
+    }
+
     @media print {
         /* Sembunyikan elemen navigasi, sidebar, navbar atas, tombol aksi, dan footer */
         nav,
@@ -143,7 +184,7 @@
             margin-bottom: 10px !important;
         }
 
-        table,
+        table.invoice-table,
         .table {
             width: 100% !important;
             max-width: 100% !important;
@@ -155,32 +196,43 @@
             break-inside: avoid !important;
         }
 
-        .table th,
-        .table td {
-            padding: 5px 6px !important;
-            font-size: 11px !important;
-            border: 1px solid #cbd5e1 !important;
-            width: auto !important;
-        }
-
-        .table thead th {
+        .invoice-table thead th {
             background-color: #f1f5f9 !important;
             color: #0f172a !important;
             font-weight: 700 !important;
+            border-top: 1px solid #cbd5e1 !important;
+            border-bottom: 1px solid #cbd5e1 !important;
+            border-left: none !important;
+            border-right: none !important;
+            padding: 6px 8px !important;
+            font-size: 11px !important;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
         }
 
-        .table tfoot td {
+        .invoice-table tbody td {
+            padding: 6px 8px !important;
+            font-size: 11px !important;
+            border-top: none !important;
+            border-left: none !important;
+            border-right: none !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+        }
+
+        .invoice-table tfoot td {
             font-size: 11.5px !important;
             font-weight: 700 !important;
-            padding: 5px 6px !important;
+            padding: 6px 8px !important;
             background-color: #f8fafc !important;
+            border-top: 1px solid #cbd5e1 !important;
+            border-bottom: 1px solid #cbd5e1 !important;
+            border-left: none !important;
+            border-right: none !important;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
         }
 
-        .table .text-end {
+        .invoice-table .text-end {
             white-space: nowrap !important;
         }
 
@@ -286,8 +338,13 @@
                             <strong class="text-dark">{{ $sale->sold_at->format('d F Y, H:i') }} WIB</strong>
                         </div>
                         <div class="d-flex justify-content-between small text-muted mb-1">
-                            <span>Diproses Oleh:</span>
-                            <strong class="text-dark">{{ $sale->user->name ?? '-' }} ({{ strtoupper($sale->user->role ?? 'User') }})</strong>
+                            @if(($sale->user && $sale->user->isCustomer()) || ($sale->user->role ?? '') === 'customer')
+                                <span>Kasir / Kanal:</span>
+                                <strong class="text-dark">Checkout Mandiri (Katalog Online)</strong>
+                            @else
+                                <span>Diproses Oleh:</span>
+                                <strong class="text-dark">{{ $sale->user->name ?? '-' }} ({{ strtoupper($sale->user->role ?? 'Petugas') }})</strong>
+                            @endif
                         </div>
                         <div class="d-flex justify-content-between small text-muted">
                             <span>Metode Pembayaran:</span>
@@ -299,42 +356,44 @@
 
             <!-- Purchased Items Table -->
             <div class="table-responsive mb-4">
-                <table class="table table-bordered align-middle mb-0">
-                    <thead class="table-light">
+                <table class="table invoice-table align-middle mb-0">
+                    <thead>
                         <tr>
-                            <th style="width: 50px;" class="text-center">No</th>
-                            <th style="width: 140px;">SKU</th>
-                            <th>Nama Produk Elektronik & Brand</th>
-                            <th>Kategori</th>
-                            <th class="text-center" style="width: 100px;">Kuantitas</th>
-                            <th class="text-end" style="width: 180px;">Harga Satuan</th>
-                            <th class="text-end" style="width: 190px;">Subtotal</th>
+                            <th style="width: 5%; text-align: center;">No</th>
+                            <th style="width: 13%; white-space: nowrap; font-size: 13px;">SKU</th>
+                            <th style="width: 34%;">Nama Produk</th>
+                            <th style="width: 16%; white-space: nowrap;">Kategori</th>
+                            <th style="width: 8%; text-align: center; white-space: nowrap;">Qty</th>
+                            <th style="width: 12%; text-align: right; white-space: nowrap;">Harga Satuan</th>
+                            <th style="width: 12%; text-align: right; white-space: nowrap;">Subtotal</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($sale->items as $index => $item)
                             <tr>
-                                <td class="text-center text-muted small">{{ $index + 1 }}</td>
-                                <td class="fw-bold font-monospace text-secondary small">{{ $item->product->sku ?? '-' }}</td>
+                                <td style="text-align: center;" class="text-muted small">{{ $index + 1 }}</td>
+                                <td style="white-space: nowrap; font-size: 13px;" class="fw-bold font-monospace text-secondary">{{ $item->product->sku ?? '-' }}</td>
                                 <td>
                                     <div class="fw-bold text-dark">{{ $item->product->name ?? 'Produk Diarsipkan' }}</div>
                                     @if(isset($item->product->brand))
-                                        <div class="small text-muted">Brand: {{ $item->product->brand }}</div>
+                                        <div style="font-size: 12px; color: #64748b;">Brand: {{ $item->product->brand }}</div>
                                     @endif
                                 </td>
-                                <td>
+                                <td style="white-space: nowrap;">
                                     <span class="badge bg-light text-dark border">{{ $item->product->category->name ?? '-' }}</span>
                                 </td>
-                                <td class="text-center fw-bold fs-6">{{ $item->quantity }} unit</td>
-                                <td class="text-end">Rp {{ number_format($item->unit_price, 0, ',', '.') }}</td>
-                                <td class="text-end fw-bold text-success">Rp {{ number_format($item->subtotal, 0, ',', '.') }}</td>
+                                <td style="text-align: center; white-space: nowrap;" class="fw-bold">{{ $item->quantity }} unit</td>
+                                <td style="text-align: right; white-space: nowrap;">Rp {{ number_format($item->unit_price, 0, ',', '.') }}</td>
+                                <td style="text-align: right; white-space: nowrap;" class="fw-bold text-success">Rp {{ number_format($item->subtotal, 0, ',', '.') }}</td>
                             </tr>
                         @endforeach
                     </tbody>
-                    <tfoot class="table-light">
+                    <tfoot>
                         <tr>
-                            <td colspan="6" class="text-end fw-bold fs-6">Total Pembayaran:</td>
-                            <td class="text-end fw-bold fs-5 text-success">Rp {{ number_format($sale->total, 0, ',', '.') }}</td>
+                            <td colspan="6" class="text-end fw-bold" style="font-size: 0.95rem; vertical-align: middle;">Total Pembayaran:</td>
+                            <td class="text-end text-success fw-bold" style="white-space: nowrap; font-size: 1.15rem; font-weight: 700; vertical-align: middle;">
+                                Rp {{ number_format($sale->total, 0, ',', '.') }}
+                            </td>
                         </tr>
                     </tfoot>
                 </table>
