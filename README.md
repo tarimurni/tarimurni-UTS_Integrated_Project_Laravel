@@ -19,6 +19,7 @@ Aplikasi sistem informasi pengelolaan persediaan barang (inventaris) dan transak
 - [Akun Demo Pengujian](#-akun-demo-pengujian)
 - [Entity Relationship Diagram (ERD) & Relasi Database](#-entity-relationship-diagram-erd--relasi-database)
 - [Automated Feature Tests (8 Skenario Wajib UTS)](#-automated-feature-tests-8-skenario-wajib-uts)
+- [Screenshots Aplikasi & Bukti Pengujian](#-screenshots-aplikasi--bukti-pengujian)
 - [Batasan Sistem (Known Limitations)](#-batasan-sistem-known-limitations)
 
 ---
@@ -312,7 +313,7 @@ Aplikasi dilengkapi pengujian otomatis menggunakan PHPUnit yang memverifikasi se
 
 ### Cara Menjalankan Automated Tests:
 ```bash
-# Menjalankan seluruh test suite (58 tests, 216 assertions)
+# Menjalankan seluruh test suite (65 tests, 264 assertions)
 php artisan test
 
 # Menjalankan khusus 8 skenario wajib UTS
@@ -321,11 +322,65 @@ php artisan test --filter=InventorySalesSystemTest
 
 ---
 
+## 📸 Screenshots Aplikasi & Bukti Pengujian
+
+Berikut adalah dokumentasi antarmuka aplikasi **ElectroMart** beserta bukti pengujian fungsionalitas dan validasi sistem:
+
+### 1. Halaman Autentikasi & Login Multi-Role
+Halaman masuk terpadu dengan autentikasi berbasis session, proteksi CSRF, deteksi role otomatis (Admin, Staff, Customer), serta tombol kredensial demo untuk pengujian cepat.
+![Halaman Login](public/screenshots/tampilan%20login.png)
+
+### 2. Dashboard Admin & Peringatan Stok Menipis (Low-Stock Alert)
+Dashboard real-time administrator menampilkan metrik pendapatan hari ini, omset bulanan, pengeluaran restock, jumlah produk aktif, serta tabel peringatan darurat bagi produk yang stoknya berada di bawah batas minimum (`whereColumn('stock', '<=', 'minimum_stock')`).
+![Dashboard Admin](public/screenshots/dashboard%20admin.png)
+
+### 3. Master Data - Detail Spesifikasi Produk Elektronik
+Halaman inspeksi detail produk elektronik menampilkan SKU unik, kategori, merk dagang, harga modal beli, harga jual ke pelanggan, margin laba, sisa stok gudang, dan riwayat transaksi barang terkait.
+![Detail Produk](public/screenshots/halaman%20detail%20produk.png)
+
+### 4. Master Data - Manajemen & Edit Kategori Produk
+Formulir pengelolaan kategori barang elektronik yang dilengkapi validasi keunikan nama kategori serta pencegahan penghapusan kategori (*foreign key integrity*) jika masih terasosiasi dengan produk aktif.
+![Edit Kategori](public/screenshots/halaman%20edit%20kategori.png)
+
+### 5. Master Data - Manajemen & Edit Supplier Resmi
+Antarmuka pengelolaan database distributor dan supplier resmi perangkat elektronik mencakup pencatatan nama perusahaan, nomor kontak telepon, email korespondensi, dan alamat kantor.
+![Edit Supplier](public/screenshots/halaman%20edit%20supplier.png)
+
+### 6. Transaksi Pengadaan Pembelian Barang Masuk (Stock-In)
+Pencatatan nota pembelian barang dari pemasok resmi ke gudang. Kuantitas stok produk di database bertambah secara otomatis dan atomik setelah transaksi berhasil disimpan.
+![Halaman Pembelian](public/screenshots/halaman%20pembelian.png)
+
+### 7. Transaksi Kasir Penjualan POS (Point of Sales)
+Mesin kasir digital untuk Staff dan Admin yang melayani transaksi belanja langsung di counter toko, mendukung pemilihan metode pembayaran (Tunai maupun ElectroPay Gateway), kalkulasi subtotal otomatis, dan cetak faktur struk resmi.
+![Halaman Penjualan](public/screenshots/halaman%20penjualanan.png)
+
+### 8. Katalog Belanja Mandiri Customer (E-Commerce)
+Halaman katalog publik yang memungkinkan pembeli menjelajahi perangkat elektronik, melihat ketersediaan stok, memilih varian warna, memasukkan ke keranjang belanja interaktif, dan memproses checkout pesanan mandiri (*guest checkout*).
+![Tampilan Customer](public/screenshots/tampilan%20customer.png)
+
+### 9. Fitur Pencarian Cerdas (Search) & Filter Multi-Kriteria
+Pengujian fitur filter dan pencarian instan berdasarkan nomor SKU, nama produk, kategori, status stok (Tersedia / Stok Rendah / Habis), serta rentang tanggal transaksi yang tetap mempertahankan parameter query saat berpindah halaman (*pagination withQueryString*).
+![Fitur Pencarian](public/screenshots/Tampilan%20fitur%20Pencarian%20(Search).png)
+
+### 10. Proteksi Hak Akses & Penolakan HTTP 403 Forbidden
+Mekanisme keamanan *Role-Based Authorization Middleware* yang secara ketat memblokir akses pengguna non-admin (Staff atau Customer) saat mencoba membuka atau mengeksekusi endpoint khusus Administrator.
+![Tampilan Pesan Error 403](public/screenshots/tampilan%20pesan%20error.png)
+
+### 11. Validasi Ketat Stok Tidak Mencukupi (Insufficient Stock Error State)
+Validasi integritas inventaris yang menolak transaksi apabila kuantitas barang yang dipesan melebihi sisa stok riil di database, mencegah terjadinya *overselling* atau nilai stok negatif.
+![Insufficient Stock Error State](public/screenshots/Insufficient%20stock%20error%20state.jpeg)
+
+### 12. Bukti Hasil Pengujian Otomatis (Automated PHPUnit Tests)
+Hasil eksekusi pengujian otomatis `php artisan test` yang memvalidasi seluruh fungsionalitas sistem (autentikasi, otorisasi role, kalkulasi stok atomik, payment gateway, dan isolasi data) dengan status kelulusan **100% PASS (65 passed, 264 assertions)** tanpa error.
+![Hasil Testing](public/screenshots/hasil%20testing.jpeg)
+
+---
+
 ## ⚠️ Batasan Sistem (Known Limitations)
 
 Sesuai ruang lingkup dan batasan proyek Ujian Tengah Semester (UTS):
-1. **Simulasi Pembayaran Langsung (Direct Settlement)**:
-   Alur kasir POS dan checkout pelanggan disederhanakan sebagai pembayaran langsung berstatus lunas (`completed`) tanpa integrasi API *Payment Gateway* pihak ketiga (seperti Midtrans, Xendit, atau DOKU).
+1. **Payment Gateway Simulator (ElectroPay / Midtrans Snap)**:
+   Telah terintegrasi simulator gerbang pembayaran multi-channel (QRIS Standar Nasional, Virtual Account BCA/BSI/Mandiri, E-Wallet, dan Tunai Kasir) dengan mekanisme *callback* instan tanpa memerlukan credentials production berbayar.
 2. **Tanpa Integrasi API Ekspedisi**:
    Sistem pengiriman produk belum terhubung dengan kalkulator ongkos kirim real-time (seperti RajaOngkir).
 3. **Single Warehouse Inventory**:
