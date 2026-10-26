@@ -202,6 +202,93 @@
                         </div>
                     </div>
 
+                    <!-- Payment Gateway Selection -->
+                    <div class="p-3 mb-3 bg-light rounded-3 border">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <h6 class="fw-bold text-dark small mb-0">
+                                <i class="bi bi-shield-check text-primary me-1"></i> Metode Pembayaran
+                            </h6>
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle" style="font-size: 0.65rem;">
+                                <i class="bi bi-lightning-charge-fill me-1"></i>ElectroPay
+                            </span>
+                        </div>
+                        <div class="text-muted small mb-2" style="font-size: 0.72rem;">
+                            Didukung Midtrans Snap Gateway dengan verifikasi otomatis instan.
+                        </div>
+
+                        <div class="d-flex flex-column gap-2">
+                            <!-- QRIS -->
+                            <label class="border rounded-2 p-2 bg-white d-flex align-items-center justify-content-between mb-0" for="cat_pay_qris" style="cursor: pointer;">
+                                <div class="d-flex align-items-center gap-2">
+                                    <input class="form-check-input mt-0" type="radio" name="payment_method" id="cat_pay_qris" value="qris" checked>
+                                    <div>
+                                        <div class="fw-bold text-dark small d-flex align-items-center gap-1">
+                                            <i class="bi bi-qr-code-scan text-danger"></i> QRIS Instant
+                                            <span class="badge bg-danger text-white ms-1" style="font-size: 0.58rem;">Semua Bank & E-Wallet</span>
+                                        </div>
+                                        <div class="text-muted" style="font-size: 0.68rem;">Scan QR via BCA, Mandiri, BRI, BSI, GoPay, OVO, Dana</div>
+                                    </div>
+                                </div>
+                            </label>
+
+                            <!-- VA BCA -->
+                            <label class="border rounded-2 p-2 bg-white d-flex align-items-center justify-content-between mb-0" for="cat_pay_va_bca" style="cursor: pointer;">
+                                <div class="d-flex align-items-center gap-2">
+                                    <input class="form-check-input mt-0" type="radio" name="payment_method" id="cat_pay_va_bca" value="va_bca">
+                                    <div>
+                                        <div class="fw-bold text-dark small d-flex align-items-center gap-1">
+                                            <i class="bi bi-bank2 text-primary"></i> BCA Virtual Account
+                                        </div>
+                                        <div class="text-muted" style="font-size: 0.68rem;">Transfer otomatis via m-BCA, KlikBCA & ATM BCA</div>
+                                    </div>
+                                </div>
+                                <span class="badge bg-light text-primary border" style="font-size: 0.6rem;">BCA</span>
+                            </label>
+
+                            <!-- VA BSI -->
+                            <label class="border rounded-2 p-2 bg-white d-flex align-items-center justify-content-between mb-0" for="cat_pay_va_bsi" style="cursor: pointer;">
+                                <div class="d-flex align-items-center gap-2">
+                                    <input class="form-check-input mt-0" type="radio" name="payment_method" id="cat_pay_va_bsi" value="va_bsi">
+                                    <div>
+                                        <div class="fw-bold text-dark small d-flex align-items-center gap-1">
+                                            <i class="bi bi-bank text-teal" style="color: #00a39e;"></i> BSI Virtual Account
+                                        </div>
+                                        <div class="text-muted" style="font-size: 0.68rem;">Bank Syariah Indonesia (BSI Mobile & ATM)</div>
+                                    </div>
+                                </div>
+                                <span class="badge bg-light border" style="font-size: 0.6rem; color: #00a39e;">BSI</span>
+                            </label>
+
+                            <!-- VA Mandiri -->
+                            <label class="border rounded-2 p-2 bg-white d-flex align-items-center justify-content-between mb-0" for="cat_pay_va_mandiri" style="cursor: pointer;">
+                                <div class="d-flex align-items-center gap-2">
+                                    <input class="form-check-input mt-0" type="radio" name="payment_method" id="cat_pay_va_mandiri" value="va_mandiri">
+                                    <div>
+                                        <div class="fw-bold text-dark small d-flex align-items-center gap-1">
+                                            <i class="bi bi-wallet2 text-warning"></i> Mandiri Bill / VA
+                                        </div>
+                                        <div class="text-muted" style="font-size: 0.68rem;">Pembayaran via Livin' by Mandiri & ATM Mandiri</div>
+                                    </div>
+                                </div>
+                                <span class="badge bg-light text-warning border" style="font-size: 0.6rem;">Mandiri</span>
+                            </label>
+
+                            <!-- E-Wallet -->
+                            <label class="border rounded-2 p-2 bg-white d-flex align-items-center justify-content-between mb-0" for="cat_pay_ewallet" style="cursor: pointer;">
+                                <div class="d-flex align-items-center gap-2">
+                                    <input class="form-check-input mt-0" type="radio" name="payment_method" id="cat_pay_ewallet" value="ewallet">
+                                    <div>
+                                        <div class="fw-bold text-dark small d-flex align-items-center gap-1">
+                                            <i class="bi bi-phone-fill text-info"></i> E-Wallet Instant
+                                        </div>
+                                        <div class="text-muted" style="font-size: 0.68rem;">GoPay / OVO / DANA / ShopeePay</div>
+                                    </div>
+                                </div>
+                                <span class="badge bg-info-subtle text-info border border-info-subtle" style="font-size: 0.6rem;">E-Wallet</span>
+                            </label>
+                        </div>
+                    </div>
+
                     <button type="submit" class="btn btn-success w-100 py-2 fw-semibold" id="checkoutBtn" disabled>
                         <i class="bi bi-credit-card-2-front me-1"></i> Proses Checkout Pesanan
                     </button>

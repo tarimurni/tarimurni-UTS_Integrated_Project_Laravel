@@ -3,7 +3,7 @@
 [![Laravel 12](https://img.shields.io/badge/Laravel-12.x-FF2D20?style=flat&logo=laravel&logoColor=white)](https://laravel.com)
 [![PHP Version](https://img.shields.io/badge/PHP-%3E%3D8.2-777BB4?style=flat&logo=php&logoColor=white)](https://www.php.net)
 [![Database](https://img.shields.io/badge/MySQL-XAMPP-4479A1?style=flat&logo=mysql&logoColor=white)](https://www.apachefriends.org)
-[![PHPUnit Tests](https://img.shields.io/badge/Tests-58%20Passed-success?style=flat&logo=phpunit&logoColor=white)](https://phpunit.de)
+[![PHPUnit Tests](https://img.shields.io/badge/Tests-65%20Passed-success?style=flat&logo=phpunit&logoColor=white)](https://phpunit.de)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 Proyek Ujian Tengah Semester (UTS) Mata Kuliah **Pemrograman Web**.  
@@ -32,16 +32,25 @@ Aplikasi sistem informasi pengelolaan persediaan barang (inventaris) dan transak
    - Transaksi **Pembelian (Stock-In)** dari distributor resmi otomatis menambah stok produk.
    - Transaksi **Penjualan (Stock-Out)** via kasir POS maupun checkout online otomatis mengurangi stok produk.
    - Menggunakan `DB::transaction` dan *pessimistic locking* (`Product::lockForUpdate()`) guna menjamin integritas data ACID (*Atomicity, Consistency, Isolation, Durability*) serta mencegah *race condition* dan *overselling*.
-2. **Dashboard Agregat Real-Time**:
+2. **Integrasi Payment Gateway Interaktif (ElectroPay powered by Midtrans Snap)**:
+   - Dukungan kanal pembayaran multi-channel otomatis:
+     - **QRIS Instant (Scan QR)**: Standar nasional QRIS kompatibel dengan seluruh Mobile Banking (BCA, Mandiri, BRI, BSI) & E-Wallet (GoPay, OVO, DANA, ShopeePay) dengan identitas merchant resmi *"ELECTROMART OFFICIAL STORE"*.
+     - **Bank Virtual Account (VA)**: Nomor VA 16 digit terformat otomatis untuk Bank BCA (`80777...`), Bank BSI Syariah (`90012...`), dan Bank Mandiri (`88901...`) dilengkapi tombol *1-klik Salin Nomor VA* dan panduan transfer ATM/Mobile Banking.
+     - **E-Wallet Instant**: Simulasi push notification pembayaran via aplikasi dompet digital.
+     - **Tunai / Cash di Toko**: Transaksi kasir langsung (offline) di meja counter.
+   - Layar pembayaran interaktif (`/sales/{sale}/payment`) dan popup modal `#snapModal` dengan countdown timer 15 menit dan simulasi verifikasi lunas (*Callback Verifikasi Lunas*).
+   - Pencatatan otomatis nomor referensi payment gateway (`payment_reference`), metode pembayaran (`payment_method`), waktu lunas (`paid_at`), serta badge status `LUNAS (PAID)` pada struk nota.
+   - Mekanisme pembatalan (*cancel*): status pembayaran otomatis berubah menjadi `refunded` dan kuantitas produk dikembalikan ke gudang secara atomik.
+3. **Dashboard Agregat Real-Time**:
    - Menghitung omset penjualan hari ini dan bulan ini, biaya pembelian barang masuk, jumlah produk aktif, serta 5 transaksi terakhir langsung dari database.
    - Widget peringatan **Stok Barang Menipis (Low-Stock Alert)** menggunakan query `whereColumn('stock', '<=', 'minimum_stock')` dengan penanda visual status darurat.
-3. **Pencarian, Filter Lanjutan, & Pagination**:
+4. **Pencarian, Filter Lanjutan, & Pagination**:
    - Pencarian berdasarkan SKU, nama produk, nomor invoice/PO.
    - Filter dinamis berdasarkan kategori, status stok (Tersedia, Stok Rendah, Habis), serta rentang tanggal transaksi (`start_date` s/d `end_date`).
    - Seluruh daftar menggunakan `paginate(10)->withQueryString()` agar kondisi filter tetap bertahan saat berpindah halaman.
-4. **Pembatalan Transaksi dengan Rollback Stok (Admin Only)**:
+5. **Pembatalan Transaksi dengan Rollback Stok (Admin Only)**:
    - Admin dapat membatalkan faktur penjualan (stok dikembalikan) atau pembelian (stok ditarik kembali dengan validasi kecukupan stok).
-5. **Isolasi Privasi Pelanggan**:
+6. **Isolasi Privasi Pelanggan**:
    - Customer hanya dapat melihat dan mengakses riwayat pesanan serta struk/invoice milik akunnya sendiri.
 
 ---
@@ -76,8 +85,8 @@ Ikuti langkah-langkah di bawah ini secara berurutan untuk menjalankan proyek di 
 ### 1. Clone Repository
 Buka terminal (Git Bash / PowerShell), arahkan ke direktori web server (misalnya `C:/xampp/htdocs/`):
 ```bash
-git clone https://github.com/tarimurni/UTS_Integrated_Project_Laravel.git
-cd UTS_Integrated_Project_Laravel
+git clone https://github.com/tarimurni/tarimurni-UTS_Integrated_Project_Laravel.git
+cd tarimurni-UTS_Integrated_Project_Laravel
 ```
 
 ### 2. Install Dependensi PHP
@@ -243,6 +252,10 @@ erDiagram
         bigint customer_id FK "nullable"
         decimal total
         enum status "completed, cancelled"
+        string payment_method "qris, va_bca, va_bsi, va_mandiri, ewallet, cash"
+        string payment_status "paid, unpaid, failed, refunded"
+        string payment_reference "nullable"
+        timestamp paid_at "nullable"
         timestamp sold_at
         timestamp created_at
         timestamp updated_at

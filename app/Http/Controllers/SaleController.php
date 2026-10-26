@@ -86,15 +86,18 @@ class SaleController extends Controller
     public function store(StoreSaleRequest $request): RedirectResponse
     {
         try {
+            $paymentMethod = $request->input('payment_method', 'cash');
             $sale = $this->saleService->createSale(
                 creator: Auth::user(),
                 customerId: $request->input('customer_id'),
                 items: $request->input('items', []),
-                soldAt: $request->input('sold_at')
+                soldAt: $request->input('sold_at'),
+                paymentMethod: $paymentMethod,
+                paymentStatus: 'paid'
             );
 
             return redirect()->route('sales.show', $sale)
-                ->with('success', "Transaksi Kasir {$sale->sale_number} berhasil diproses dan struk penjualan siap dicetak.");
+                ->with('success', "Transaksi Kasir {$sale->sale_number} berhasil diproses via {$sale->payment_method_label} (Ref: {$sale->payment_reference}).");
         } catch (ValidationException $ve) {
             return back()->withErrors($ve->errors())->withInput();
         } catch (Exception $e) {
@@ -122,6 +125,48 @@ class SaleController extends Controller
     }
 
     /**
+     * Display dedicated ElectroPay (Midtrans Snap) Payment Gateway Simulator.
+     */
+    public function paymentGate(Sale $sale): View
+    {
+        $user = Auth::user();
+
+        if ($user->isCustomer()) {
+            if ($sale->customer_id !== $user->id && $sale->user_id !== $user->id) {
+                abort(403, 'Akses Ditolak: Anda tidak memiliki izin untuk mengakses pembayaran transaksi ini.');
+            }
+        }
+
+        $sale->load(['user', 'customer', 'items.product']);
+
+        return view('sales.payment', compact('sale'));
+    }
+
+    /**
+     * Process simulated callback or instant payment confirmation from payment gateway.
+     */
+    public function simulatePayment(Request $request, Sale $sale): RedirectResponse
+    {
+        $user = Auth::user();
+
+        if ($user->isCustomer()) {
+            if ($sale->customer_id !== $user->id && $sale->user_id !== $user->id) {
+                abort(403, 'Akses Ditolak.');
+            }
+        }
+
+        $newMethod = $request->input('payment_method');
+        if ($newMethod && in_array($newMethod, ['qris', 'va_bca', 'va_bsi', 'va_mandiri', 'ewallet', 'cash'])) {
+            $sale->update(['payment_method' => $newMethod]);
+        }
+
+        $this->saleService->confirmPayment($sale);
+
+        return redirect()->route('sales.show', $sale)
+            ->with('success', "Simulasi Pembayaran ElectroPay ({$sale->payment_method_label}) BERHASIL diverifikasi! Ref: {$sale->payment_reference}");
+    }
+
+    /**
      * Cancel sale transaction and restore product stock (Admin Only).
      */
     public function cancel(Sale $sale): RedirectResponse
@@ -134,7 +179,7 @@ class SaleController extends Controller
             $this->saleService->cancelSale($sale);
 
             return redirect()->route('sales.show', $sale)
-                ->with('warning', "Transaksi {$sale->sale_number} telah DIBATALKAN dan stok barang berhasil dikembalikan ke inventaris.");
+                ->with('warning', "Transaksi {$sale->sale_number} telah DIBATALKAN, status pembayaran di-refund, dan stok barang dikembalikan ke inventaris.");
         } catch (Exception $e) {
             return back()->with('error', 'Pembatalan penjualan gagal: ' . $e->getMessage());
         }

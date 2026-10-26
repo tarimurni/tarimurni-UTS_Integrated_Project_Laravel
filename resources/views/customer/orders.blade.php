@@ -26,9 +26,10 @@
                     <table class="table table-hover align-middle mb-0">
                         <thead class="table-light">
                             <tr>
-                                <th style="width: 50px;">No</th>
+                                <th style="width: 45px;">No</th>
                                 <th>No. Invoice</th>
                                 <th>Tanggal Pesanan</th>
+                                <th>Metode Pembayaran</th>
                                 <th>Detail Produk</th>
                                 <th class="text-end" style="white-space: nowrap;">Total Pembayaran</th>
                                 <th class="text-center" style="width: 140px;">Status Pesanan</th>
@@ -46,6 +47,11 @@
                                     </td>
                                     <td class="small text-muted">
                                         {{ $order->sold_at->format('d M Y, H:i') }}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle" style="font-size: 0.7rem;">
+                                            {{ $order->payment_method_label }}
+                                        </span>
                                     </td>
                                     <td>
                                         <div class="small text-dark">
@@ -79,7 +85,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="text-center py-5 text-muted">
+                                    <td colspan="8" class="text-center py-5 text-muted">
                                         <i class="bi bi-bag-x fs-1 d-block mb-2 text-secondary"></i>
                                         Belum ada riwayat pesanan yang pernah Anda lakukan.<br>
                                         <a href="{{ route('catalog.index') }}" class="btn btn-primary btn-sm mt-3 d-print-none">

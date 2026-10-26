@@ -203,4 +203,81 @@ class SaleTest extends TestCase
         $response = $this->actingAs($this->staff)->post("/sales/{$sale->id}/cancel");
         $response->assertStatus(403);
     }
+
+    public function test_checkout_with_payment_method_saves_gateway_reference_and_status(): void
+    {
+        $response = $this->actingAs($this->customer1)->post('/catalog/checkout', [
+            'payment_method' => 'va_bca',
+            'items' => [
+                [
+                    'product_id' => $this->productA->id,
+                    'quantity' => 1,
+                ],
+            ],
+        ]);
+
+        $sale = Sale::latest()->first();
+        $this->assertNotNull($sale);
+        $response->assertRedirect("/sales/{$sale->id}");
+        $response->assertSessionHas('open_snap_modal', true);
+
+        $this->assertEquals('va_bca', $sale->payment_method);
+        $this->assertEquals('paid', $sale->payment_status);
+        $this->assertStringStartsWith('PG-MID-', $sale->payment_reference);
+        $this->assertNotNull($sale->paid_at);
+        $this->assertStringContainsString('80777', $sale->virtual_account_number);
+    }
+
+    public function test_admin_cancelling_sale_sets_payment_status_to_refunded(): void
+    {
+        $sale = Sale::create([
+            'user_id' => $this->staff->id,
+            'customer_id' => $this->customer1->id,
+            'sale_number' => 'INV-20261026-REFU',
+            'total' => 2500000,
+            'status' => 'completed',
+            'payment_method' => 'qris',
+            'payment_status' => 'paid',
+            'payment_reference' => 'PG-MID-20261026-99999',
+            'paid_at' => now(),
+            'sold_at' => now(),
+        ]);
+
+        $response = $this->actingAs($this->admin)->post("/sales/{$sale->id}/cancel");
+        $response->assertRedirect("/sales/{$sale->id}");
+
+        $sale->refresh();
+        $this->assertEquals('cancelled', $sale->status);
+        $this->assertEquals('refunded', $sale->payment_status);
+    }
+
+    public function test_customer_can_access_payment_gateway_simulator_and_simulate_success(): void
+    {
+        $sale = Sale::create([
+            'user_id' => $this->customer1->id,
+            'customer_id' => $this->customer1->id,
+            'sale_number' => 'INV-20261026-SNAP',
+            'total' => 1500000,
+            'status' => 'completed',
+            'payment_method' => 'qris',
+            'payment_status' => 'paid',
+            'payment_reference' => 'PG-MID-20261026-12345',
+            'paid_at' => now(),
+            'sold_at' => now(),
+        ]);
+
+        // Customer can open dedicated /sales/{sale}/payment page
+        $this->actingAs($this->customer1)->get("/sales/{$sale->id}/payment")->assertStatus(200);
+
+        // Simulation post callback
+        $simResponse = $this->actingAs($this->customer1)->post("/sales/{$sale->id}/payment/simulate", [
+            'payment_method' => 'va_bsi',
+        ]);
+        $simResponse->assertRedirect("/sales/{$sale->id}");
+
+        $sale->refresh();
+        $this->assertEquals('va_bsi', $sale->payment_method);
+        $this->assertEquals('paid', $sale->payment_status);
+        $this->assertNotNull($sale->paid_at);
+    }
 }

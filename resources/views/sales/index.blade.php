@@ -58,15 +58,16 @@
                     <table class="table table-hover align-middle mb-0">
                         <thead class="table-light">
                             <tr>
-                                <th style="width: 50px;">No</th>
+                                <th style="width: 45px;">No</th>
                                 <th>No. Invoice</th>
                                 <th>Tanggal & Waktu</th>
                                 <th>Pelanggan / Customer</th>
                                 <th>Kasir / Petugas</th>
-                                <th class="text-center" style="width: 110px;">Item Terjual</th>
+                                <th>Metode Pembayaran</th>
+                                <th class="text-center" style="width: 100px;">Item</th>
                                 <th class="text-end">Total Penjualan</th>
-                                <th class="text-center" style="width: 120px;">Status</th>
-                                <th class="text-end" style="width: 120px;">Aksi</th>
+                                <th class="text-center" style="width: 110px;">Status</th>
+                                <th class="text-end" style="width: 110px;">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -94,6 +95,18 @@
                                     <td>
                                         <span class="small text-dark fw-medium">{{ $sale->user->name ?? '-' }}</span>
                                     </td>
+                                    <td>
+                                        <div class="d-flex flex-column align-items-start">
+                                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle" style="font-size: 0.68rem;">
+                                                {{ $sale->payment_method_label }}
+                                            </span>
+                                            @if($sale->payment_reference)
+                                                <span class="text-muted font-monospace mt-1" style="font-size: 0.65rem;">
+                                                    {{ $sale->payment_reference }}
+                                                </span>
+                                            @endif
+                                        </div>
+                                    </td>
                                     <td class="text-center">
                                         <span class="badge bg-light text-dark border px-2 py-1">{{ $sale->items_count }} item</span>
                                     </td>
@@ -119,7 +132,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="9" class="text-center py-4 text-muted">
+                                    <td colspan="10" class="text-center py-4 text-muted">
                                         <i class="bi bi-inbox fs-2 d-block mb-2"></i>
                                         Belum ada riwayat transaksi penjualan.
                                     </td>

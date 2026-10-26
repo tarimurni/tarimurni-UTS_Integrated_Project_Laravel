@@ -109,14 +109,18 @@ class CatalogController extends Controller
         }
 
         try {
+            $paymentMethod = $request->input('payment_method', 'qris');
             $sale = $this->saleService->createSale(
                 creator: $user,
                 customerId: $user->id,
-                items: $request->input('items', [])
+                items: $request->input('items', []),
+                paymentMethod: $paymentMethod,
+                paymentStatus: 'paid'
             );
 
             return redirect()->route('sales.show', $sale)
-                ->with('success', "Pesanan Anda (#{$sale->sale_number}) berhasil dibuat! Terima kasih telah berbelanja di ElectroMart.");
+                ->with('success', "Pesanan Anda (#{$sale->sale_number}) berhasil dibuat dengan metode pembayaran {$sale->payment_method_label}!")
+                ->with('open_snap_modal', true);
         } catch (ValidationException $ve) {
             return back()->withErrors($ve->errors())->withInput();
         } catch (Exception $e) {

@@ -98,8 +98,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/sales', [SaleController::class, 'store'])->name('sales.store');
     });
 
-    // Shared Invoice / Receipt Viewer (Accessible by Admin/Staff, and Customer for their own orders)
+    // Shared Invoice / Receipt Viewer & Payment Gateway (Accessible by Admin/Staff, and Customer for their own orders)
     Route::get('/sales/{sale}', [SaleController::class, 'show'])->name('sales.show');
+    Route::get('/sales/{sale}/payment', [SaleController::class, 'paymentGate'])->name('sales.payment');
+    Route::post('/sales/{sale}/payment/simulate', [SaleController::class, 'simulatePayment'])->name('sales.payment.simulate');
 
     // ==========================================
     // Customer Orders History (Customer Only)

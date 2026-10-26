@@ -27,6 +27,7 @@ class CustomerCheckoutRequest extends FormRequest
             'items' => ['required', 'array', 'min:1'],
             'items.*.product_id' => ['required', 'distinct', 'exists:products,id'],
             'items.*.quantity' => ['required', 'integer', 'min:1'],
+            'payment_method' => ['nullable', 'string', 'in:qris,va_bca,va_bsi,va_mandiri,ewallet'],
             'customer_name' => [$hasAuth ? 'nullable' : 'required_without:name', 'string', 'max:150'],
             'name' => ['nullable', 'string', 'max:150'],
             'customer_phone' => ['nullable', 'string', 'max:30'],

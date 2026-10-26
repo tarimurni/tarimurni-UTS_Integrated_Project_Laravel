@@ -103,6 +103,105 @@
                         </table>
                     </div>
 
+                    <!-- Payment Method Section (ElectroPay & Cash) -->
+                    <div class="card border-0 bg-light rounded-3 p-3 mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="fw-bold text-dark mb-0">
+                                <i class="bi bi-wallet2 text-success me-2"></i>Metode Pembayaran Kasir (ElectroPay Gateway)
+                            </h6>
+                            <span class="badge bg-success-subtle text-success border border-success-subtle">
+                                <i class="bi bi-shield-check me-1"></i>Otomatis Verifikasi Lunas
+                            </span>
+                        </div>
+                        <p class="text-muted small mb-3">Pilih kanal pembayaran pelanggan. Transaksi langsung tercatat dengan nomor referensi unik Payment Gateway.</p>
+
+                        <div class="row g-2">
+                            <!-- Tunai / Cash -->
+                            <div class="col-md-4 col-sm-6">
+                                <label class="payment-box border rounded-3 p-3 bg-white d-flex align-items-start gap-2 h-100 cursor-pointer shadow-sm position-relative" for="pos_cash" style="cursor: pointer;">
+                                    <input class="form-check-input mt-1" type="radio" name="payment_method" id="pos_cash" value="cash" checked>
+                                    <div>
+                                        <div class="fw-bold text-dark small d-flex align-items-center gap-1">
+                                            <i class="bi bi-cash-stack text-success fs-6"></i> Tunai / Cash di Toko
+                                        </div>
+                                        <div class="text-muted" style="font-size: 0.72rem;">Uang tunai fisik diterima langsung oleh kasir</div>
+                                        <span class="badge bg-success text-white mt-1" style="font-size: 0.6rem;">Kasir Offline</span>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- QRIS Instant -->
+                            <div class="col-md-4 col-sm-6">
+                                <label class="payment-box border rounded-3 p-3 bg-white d-flex align-items-start gap-2 h-100 cursor-pointer shadow-sm" for="pos_qris" style="cursor: pointer;">
+                                    <input class="form-check-input mt-1" type="radio" name="payment_method" id="pos_qris" value="qris">
+                                    <div>
+                                        <div class="fw-bold text-dark small d-flex align-items-center gap-1">
+                                            <i class="bi bi-qr-code-scan text-danger fs-6"></i> QRIS Instant
+                                        </div>
+                                        <div class="text-muted" style="font-size: 0.72rem;">Scan QR di layar kasir (BCA, GoPay, OVO, Dana, dll)</div>
+                                        <span class="badge bg-danger text-white mt-1" style="font-size: 0.6rem;">Semua Bank & E-Wallet</span>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- BCA VA -->
+                            <div class="col-md-4 col-sm-6">
+                                <label class="payment-box border rounded-3 p-3 bg-white d-flex align-items-start gap-2 h-100 cursor-pointer shadow-sm" for="pos_va_bca" style="cursor: pointer;">
+                                    <input class="form-check-input mt-1" type="radio" name="payment_method" id="pos_va_bca" value="va_bca">
+                                    <div>
+                                        <div class="fw-bold text-dark small d-flex align-items-center gap-1">
+                                            <i class="bi bi-bank2 text-primary fs-6"></i> BCA Virtual Account
+                                        </div>
+                                        <div class="text-muted" style="font-size: 0.72rem;">Transfer m-BCA / ATM BCA nomor VA 16 digit</div>
+                                        <span class="badge bg-light text-primary border mt-1" style="font-size: 0.6rem;">BCA</span>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- BSI VA -->
+                            <div class="col-md-4 col-sm-6">
+                                <label class="payment-box border rounded-3 p-3 bg-white d-flex align-items-start gap-2 h-100 cursor-pointer shadow-sm" for="pos_va_bsi" style="cursor: pointer;">
+                                    <input class="form-check-input mt-1" type="radio" name="payment_method" id="pos_va_bsi" value="va_bsi">
+                                    <div>
+                                        <div class="fw-bold text-dark small d-flex align-items-center gap-1">
+                                            <i class="bi bi-bank fs-6" style="color: #00a39e;"></i> BSI Virtual Account
+                                        </div>
+                                        <div class="text-muted" style="font-size: 0.72rem;">Bank Syariah Indonesia (BSI Mobile / ATM BSI)</div>
+                                        <span class="badge bg-light border mt-1" style="font-size: 0.6rem; color: #00a39e;">BSI Syariah</span>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- Mandiri VA -->
+                            <div class="col-md-4 col-sm-6">
+                                <label class="payment-box border rounded-3 p-3 bg-white d-flex align-items-start gap-2 h-100 cursor-pointer shadow-sm" for="pos_va_mandiri" style="cursor: pointer;">
+                                    <input class="form-check-input mt-1" type="radio" name="payment_method" id="pos_va_mandiri" value="va_mandiri">
+                                    <div>
+                                        <div class="fw-bold text-dark small d-flex align-items-center gap-1">
+                                            <i class="bi bi-wallet2 text-warning fs-6"></i> Mandiri Bill / VA
+                                        </div>
+                                        <div class="text-muted" style="font-size: 0.72rem;">Pembayaran via Livin' by Mandiri & ATM Mandiri</div>
+                                        <span class="badge bg-light text-warning border mt-1" style="font-size: 0.6rem;">Mandiri</span>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- E-Wallet -->
+                            <div class="col-md-4 col-sm-6">
+                                <label class="payment-box border rounded-3 p-3 bg-white d-flex align-items-start gap-2 h-100 cursor-pointer shadow-sm" for="pos_ewallet" style="cursor: pointer;">
+                                    <input class="form-check-input mt-1" type="radio" name="payment_method" id="pos_ewallet" value="ewallet">
+                                    <div>
+                                        <div class="fw-bold text-dark small d-flex align-items-center gap-1">
+                                            <i class="bi bi-phone-fill text-info fs-6"></i> E-Wallet Instant
+                                        </div>
+                                        <div class="text-muted" style="font-size: 0.72rem;">GoPay / OVO / DANA / ShopeePay</div>
+                                        <span class="badge bg-info-subtle text-info border border-info-subtle mt-1" style="font-size: 0.6rem;">E-Wallet</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="d-flex justify-content-between align-items-center pt-3 border-top">
                         <div class="small text-muted">
                             <i class="bi bi-shield-lock-fill text-success me-1"></i>

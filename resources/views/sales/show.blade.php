@@ -266,6 +266,10 @@
             @endif
 
             <div class="d-flex gap-2">
+                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#snapModal">
+                    <i class="bi bi-credit-card-2-front me-1"></i> Buka Layanan ElectroPay (Snap)
+                </button>
+
                 <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.print()">
                     <i class="bi bi-printer me-1"></i> Cetak Struk (Print)
                 </button>
@@ -302,7 +306,7 @@
                     <div class="fw-bold font-monospace text-success fs-5 mb-2">{{ $sale->sale_number }}</div>
                     @if($sale->status === 'completed')
                         <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 fs-6">
-                            <i class="bi bi-check-circle-fill me-1"></i> Pembayaran Lunas (Completed)
+                            <i class="bi bi-check-circle-fill me-1"></i> LUNAS (PAID)
                         </span>
                     @else
                         <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2 fs-6">
@@ -346,10 +350,38 @@
                                 <strong class="text-dark">{{ $sale->user->name ?? '-' }} ({{ strtoupper($sale->user->role ?? 'Petugas') }})</strong>
                             @endif
                         </div>
-                        <div class="d-flex justify-content-between small text-muted">
+                        <div class="d-flex justify-content-between align-items-center small text-muted mb-1">
                             <span>Metode Pembayaran:</span>
-                            <strong class="text-dark">Tunai / Transfer Lunas</strong>
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle">
+                                <i class="bi bi-credit-card me-1"></i>{{ $sale->payment_method_label }}
+                            </span>
                         </div>
+                        <div class="d-flex justify-content-between small text-muted mb-1">
+                            <span>Referensi Gateway:</span>
+                            <span class="font-monospace text-dark fw-semibold">{{ $sale->payment_reference ?? ('PG-MID-' . date('Ymd') . '-' . str_pad($sale->id, 5, '0', STR_PAD_LEFT)) }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center small text-muted mb-1">
+                            <span>Status Pembayaran:</span>
+                            @if($sale->payment_status === 'refunded' || $sale->status === 'cancelled')
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle">
+                                    <i class="bi bi-arrow-counterclockwise me-1"></i>REFUNDED
+                                </span>
+                            @elseif($sale->payment_status === 'paid' || $sale->status === 'completed')
+                                <span class="badge bg-success-subtle text-success border border-success-subtle">
+                                    <i class="bi bi-check-circle-fill me-1"></i>LUNAS (PAID)
+                                </span>
+                            @else
+                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle">
+                                    <i class="bi bi-clock-history me-1"></i>UNPAID
+                                </span>
+                            @endif
+                        </div>
+                        @if($sale->paid_at)
+                            <div class="d-flex justify-content-between small text-muted">
+                                <span>Waktu Verifikasi:</span>
+                                <strong class="text-dark">{{ $sale->paid_at->format('d/m/Y H:i') }} WIB</strong>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -421,4 +453,216 @@
         </div>
     </div>
 </div>
+
+<!-- ElectroPay Midtrans Snap Modal (Interactive Popup) -->
+<div class="modal fade d-print-none" id="snapModal" tabindex="-1" aria-labelledby="snapModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <!-- Modal Header with Midtrans Snap Theme -->
+            <div class="p-3 px-4 text-white d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0d9488 100%);">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="bg-primary text-white p-2 rounded-3 d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                        <i class="bi bi-lightning-charge-fill fs-6"></i>
+                    </span>
+                    <div>
+                        <h6 class="fw-bold mb-0 text-white">ElectroPay <span class="badge bg-white text-dark ms-1" style="font-size: 0.6rem;">Midtrans Snap</span></h6>
+                        <div class="text-white-50" style="font-size: 0.72rem;">Ref: {{ $sale->payment_reference ?? ('PG-MID-' . date('Ymd') . '-' . str_pad($sale->id, 5, '0', STR_PAD_LEFT)) }}</div>
+                    </div>
+                </div>
+                <div class="text-end d-flex align-items-center gap-3">
+                    <div>
+                        <div class="text-white-50" style="font-size: 0.68rem;">Total Tagihan:</div>
+                        <div class="fw-bold text-warning font-monospace fs-6">Rp {{ number_format($sale->total, 0, ',', '.') }}</div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+            </div>
+
+            <div class="modal-body p-4 bg-light">
+                <!-- Status Notice -->
+                @if($sale->payment_status === 'paid')
+                    <div class="alert alert-success border-success-subtle d-flex align-items-center justify-content-between mb-3 py-2 px-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                            <div class="small">
+                                <strong>LUNAS:</strong> Pembayaran telah terverifikasi via <strong>{{ $sale->payment_method_label }}</strong>.
+                            </div>
+                        </div>
+                        <span class="badge bg-success text-white" style="font-size: 0.65rem;">PAID</span>
+                    </div>
+                @endif
+
+                <!-- Nav Tabs -->
+                <ul class="nav nav-pills nav-fill bg-white p-1 rounded-3 border mb-3 shadow-sm" id="snapTab" role="tablist">
+                    <li class="nav-item">
+                        <button class="nav-link py-2 small {{ $sale->payment_method === 'qris' || empty($sale->payment_method) ? 'active' : '' }}" id="snap-qris-tab" data-bs-toggle="pill" data-bs-target="#snap-tab-qris" type="button" role="tab">
+                            <i class="bi bi-qr-code-scan me-1 text-danger"></i> QRIS Instant
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link py-2 small {{ in_array($sale->payment_method, ['va_bca', 'va_bsi', 'va_mandiri']) ? 'active' : '' }}" id="snap-va-tab" data-bs-toggle="pill" data-bs-target="#snap-tab-va" type="button" role="tab">
+                            <i class="bi bi-bank2 me-1 text-primary"></i> Virtual Account
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link py-2 small {{ $sale->payment_method === 'ewallet' ? 'active' : '' }}" id="snap-ewallet-tab" data-bs-toggle="pill" data-bs-target="#snap-tab-ewallet" type="button" role="tab">
+                            <i class="bi bi-phone-fill me-1 text-info"></i> E-Wallet
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link py-2 small {{ $sale->payment_method === 'cash' ? 'active' : '' }}" id="snap-cash-tab" data-bs-toggle="pill" data-bs-target="#snap-tab-cash" type="button" role="tab">
+                            <i class="bi bi-cash-stack me-1 text-success"></i> Tunai Kasir
+                        </button>
+                    </li>
+                </ul>
+
+                <!-- Tab Contents -->
+                <div class="tab-content">
+                    <!-- QRIS -->
+                    <div class="tab-pane fade {{ $sale->payment_method === 'qris' || empty($sale->payment_method) ? 'show active' : '' }}" id="snap-tab-qris" role="tabpanel">
+                        <div class="row g-3 align-items-center">
+                            <div class="col-md-5 text-center">
+                                <div class="bg-white p-3 rounded-3 shadow-sm border d-inline-block">
+                                    <div class="bg-danger text-white py-1 px-2 rounded-2 fw-bold text-center mb-1" style="font-size: 0.72rem;">
+                                        <i class="bi bi-qr-code me-1"></i> QRIS STANDAR NASIONAL
+                                    </div>
+                                    <div class="fw-bold text-dark small" style="font-size: 0.75rem;">ELECTROMART OFFICIAL STORE</div>
+                                    <div class="text-muted" style="font-size: 0.65rem;">NMID: ID1020261026001</div>
+
+                                    <!-- QR Vector -->
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="140" height="140" class="my-2">
+                                        <rect x="10" y="10" width="40" height="40" fill="#000" rx="3" />
+                                        <rect x="16" y="16" width="28" height="28" fill="#fff" rx="2" />
+                                        <rect x="22" y="22" width="16" height="16" fill="#000" rx="2" />
+
+                                        <rect x="110" y="10" width="40" height="40" fill="#000" rx="3" />
+                                        <rect x="116" y="16" width="28" height="28" fill="#fff" rx="2" />
+                                        <rect x="122" y="22" width="16" height="16" fill="#000" rx="2" />
+
+                                        <rect x="10" y="110" width="40" height="40" fill="#000" rx="3" />
+                                        <rect x="16" y="116" width="28" height="28" fill="#fff" rx="2" />
+                                        <rect x="22" y="122" width="16" height="16" fill="#000" rx="2" />
+
+                                        <circle cx="80" cy="80" r="18" fill="#0d9488" />
+                                        <path d="M77 73 L85 80 L77 87" stroke="#ffffff" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+
+                                    <div class="fw-bold text-danger small">Rp {{ number_format($sale->total, 0, ',', '.') }}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-7">
+                                <h6 class="fw-bold text-dark small mb-2"><i class="bi bi-camera me-1 text-danger"></i> Scan QRIS via Aplikasi Favorit Anda:</h6>
+                                <p class="text-muted small mb-2" style="font-size: 0.78rem;">
+                                    Buka BCA Mobile, Livin' by Mandiri, BRImo, BSI Mobile, GoPay, OVO, atau DANA, lalu arahkan kamera ke QRIS.
+                                </p>
+                                <form action="{{ route('sales.payment.simulate', $sale) }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="payment_method" value="qris">
+                                    <button type="submit" class="btn btn-danger btn-sm w-100 py-2 fw-semibold">
+                                        <i class="bi bi-check-circle-fill me-1"></i> Simulasikan Pembayaran QRIS Berhasil (Callback Lunas)
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- VA -->
+                    <div class="tab-pane fade {{ in_array($sale->payment_method, ['va_bca', 'va_bsi', 'va_mandiri']) ? 'show active' : '' }}" id="snap-tab-va" role="tabpanel">
+                        <div class="bg-white p-3 rounded-3 border text-center mb-3">
+                            <span class="badge bg-primary-subtle text-primary mb-1">{{ $sale->payment_method_label }}</span>
+                            <div class="text-muted small" style="font-size: 0.72rem;">Nomor Virtual Account 16 Digit:</div>
+                            <div class="d-flex justify-content-center align-items-center gap-2 my-2">
+                                <span class="fs-4 fw-bold font-monospace text-dark" id="modalVaDisplay">{{ $sale->virtual_account_number }}</span>
+                                <button type="button" class="btn btn-outline-primary btn-sm" onclick="copyModalVA()">
+                                    <i class="bi bi-clipboard me-1"></i> Salin
+                                </button>
+                            </div>
+                            <div id="modalCopyAlert" class="small text-success fw-semibold" style="display: none; font-size: 0.75rem;">
+                                <i class="bi bi-check-circle-fill me-1"></i> Nomor Virtual Account disalin ke clipboard!
+                            </div>
+                            <div class="text-muted small" style="font-size: 0.72rem;">
+                                Nominal: <strong>Rp {{ number_format($sale->total, 0, ',', '.') }}</strong> (Otomatis tanpa kode unik)
+                            </div>
+                        </div>
+
+                        <form action="{{ route('sales.payment.simulate', $sale) }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="payment_method" value="{{ in_array($sale->payment_method, ['va_bca', 'va_bsi', 'va_mandiri']) ? $sale->payment_method : 'va_bca' }}">
+                            <button type="submit" class="btn btn-primary btn-sm w-100 py-2 fw-semibold">
+                                <i class="bi bi-check-circle-fill me-1"></i> Simulasikan Pembayaran VA Berhasil (Callback Lunas)
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- E-WALLET -->
+                    <div class="tab-pane fade {{ $sale->payment_method === 'ewallet' ? 'show active' : '' }}" id="snap-tab-ewallet" role="tabpanel">
+                        <div class="bg-white p-3 rounded-3 border text-center mb-3">
+                            <i class="bi bi-phone-vibrate text-info fs-2 d-block mb-1"></i>
+                            <h6 class="fw-bold text-dark small mb-1">Notifikasi Pembayaran E-Wallet Terkirim</h6>
+                            <p class="text-muted small mb-0" style="font-size: 0.78rem;">
+                                Silakan buka aplikasi GoPay / OVO / DANA di ponsel Anda untuk menyetujui transaksi Rp {{ number_format($sale->total, 0, ',', '.') }}.
+                            </p>
+                        </div>
+                        <form action="{{ route('sales.payment.simulate', $sale) }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="payment_method" value="ewallet">
+                            <button type="submit" class="btn btn-info text-white btn-sm w-100 py-2 fw-semibold">
+                                <i class="bi bi-check-circle-fill me-1"></i> Simulasikan Konfirmasi E-Wallet Berhasil
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- CASH -->
+                    <div class="tab-pane fade {{ $sale->payment_method === 'cash' ? 'show active' : '' }}" id="snap-tab-cash" role="tabpanel">
+                        <div class="bg-white p-3 rounded-3 border text-center mb-3">
+                            <i class="bi bi-cash-stack text-success fs-2 d-block mb-1"></i>
+                            <h6 class="fw-bold text-dark small mb-1">Pembayaran Kasir Tunai</h6>
+                            <p class="text-muted small mb-0" style="font-size: 0.78rem;">
+                                Pembayaran tunai fisik sejumlah Rp {{ number_format($sale->total, 0, ',', '.') }} diterima langsung di meja kasir.
+                            </p>
+                        </div>
+                        <form action="{{ route('sales.payment.simulate', $sale) }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="payment_method" value="cash">
+                            <button type="submit" class="btn btn-success btn-sm w-100 py-2 fw-semibold">
+                                <i class="bi bi-check-circle me-1"></i> Konfirmasi Pembayaran Kasir Lunas
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer bg-white d-flex justify-content-between py-2 px-4">
+                <a href="{{ route('sales.payment', $sale) }}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-box-arrow-up-right me-1"></i> Buka Layar Penuh ElectroPay
+                </a>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        @if(session('open_snap_modal'))
+            const snapModalElement = document.getElementById('snapModal');
+            if (snapModalElement) {
+                const snapModal = new bootstrap.Modal(snapModalElement);
+                snapModal.show();
+            }
+        @endif
+    });
+
+    function copyModalVA() {
+        const vaText = document.getElementById('modalVaDisplay').innerText.replace(/\s+/g, '');
+        navigator.clipboard.writeText(vaText).then(function() {
+            const alertBox = document.getElementById('modalCopyAlert');
+            alertBox.style.display = 'block';
+            setTimeout(() => { alertBox.style.display = 'none'; }, 3000);
+        });
+    }
+</script>
+@endpush

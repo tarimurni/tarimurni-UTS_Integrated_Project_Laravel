@@ -24,6 +24,7 @@ class StoreSaleRequest extends FormRequest
         return [
             'customer_id' => ['nullable', 'exists:users,id'],
             'sold_at' => ['nullable', 'date'],
+            'payment_method' => ['nullable', 'string', 'in:cash,qris,va_bca,va_bsi,va_mandiri,ewallet'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.product_id' => ['required', 'distinct', 'exists:products,id'],
             'items.*.quantity' => ['required', 'integer', 'min:1'],

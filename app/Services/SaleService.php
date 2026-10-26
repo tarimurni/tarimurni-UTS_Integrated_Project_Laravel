@@ -20,11 +20,24 @@ class SaleService
      * @param  int|null  $customerId  Nullable registered customer ID
      * @param  array<array{product_id: int, quantity: int}>  $items
      * @param  string|null  $soldAt
+     * @param  string  $paymentMethod
+     * @param  string  $paymentStatus
+     * @param  string|null  $paymentReference
+     * @param  string|null  $paidAt
      * @return Sale
      *
      * @throws ValidationException
      */
-    public function createSale(User $creator, ?int $customerId, array $items, ?string $soldAt = null): Sale
+    public function createSale(
+        User $creator,
+        ?int $customerId,
+        array $items,
+        ?string $soldAt = null,
+        string $paymentMethod = 'qris',
+        string $paymentStatus = 'paid',
+        ?string $paymentReference = null,
+        ?string $paidAt = null
+    ): Sale
     {
         if (empty($items)) {
             throw ValidationException::withMessages([
@@ -32,12 +45,17 @@ class SaleService
             ]);
         }
 
-        return DB::transaction(function () use ($creator, $customerId, $items, $soldAt) {
+        return DB::transaction(function () use ($creator, $customerId, $items, $soldAt, $paymentMethod, $paymentStatus, $paymentReference, $paidAt) {
             // 1. Generate unique invoice number: INV-YYYYMMDD-XXXX
             $datePrefix = now()->format('Ymd');
             do {
                 $saleNumber = 'INV-' . $datePrefix . '-' . strtoupper(Str::random(4));
             } while (Sale::where('sale_number', $saleNumber)->exists());
+
+            // Generate payment reference code if not provided
+            if (! $paymentReference) {
+                $paymentReference = 'PG-MID-' . $datePrefix . '-' . mt_rand(10000, 99999);
+            }
 
             // 2. Create Sale Header
             $sale = Sale::create([
@@ -47,6 +65,10 @@ class SaleService
                 'total' => 0, // Computed below
                 'status' => 'completed',
                 'sold_at' => $soldAt ? $soldAt : now(),
+                'payment_method' => $paymentMethod ?: 'qris',
+                'payment_status' => $paymentStatus ?: 'paid',
+                'payment_reference' => $paymentReference,
+                'paid_at' => ($paymentStatus === 'paid') ? ($paidAt ?: now()) : null,
             ]);
 
             $grandTotal = 0;
@@ -128,9 +150,26 @@ class SaleService
                 }
             }
 
-            $sale->update(['status' => 'cancelled']);
+            $sale->update([
+                'status' => 'cancelled',
+                'payment_status' => 'refunded',
+            ]);
 
             return $sale;
         });
+    }
+
+    /**
+     * Confirm / Simulate payment success from payment gateway.
+     */
+    public function confirmPayment(Sale $sale, ?string $reference = null): Sale
+    {
+        $sale->update([
+            'payment_status' => 'paid',
+            'payment_reference' => $reference ?: ($sale->payment_reference ?: ('PG-MID-' . now()->format('Ymd') . '-' . mt_rand(10000, 99999))),
+            'paid_at' => now(),
+        ]);
+
+        return $sale;
     }
 }

@@ -23,6 +23,10 @@ class Sale extends Model
         'total',
         'status',
         'sold_at',
+        'payment_method',
+        'payment_status',
+        'payment_reference',
+        'paid_at',
     ];
 
     /**
@@ -35,7 +39,46 @@ class Sale extends Model
         return [
             'total' => 'decimal:2',
             'sold_at' => 'datetime',
+            'paid_at' => 'datetime',
         ];
+    }
+
+    /**
+     * Get human-friendly label for payment method.
+     */
+    public function getPaymentMethodLabelAttribute(): string
+    {
+        return match ($this->payment_method) {
+            'qris' => 'QRIS Instant (All Payment)',
+            'va_bca' => 'BCA Virtual Account',
+            'va_bsi' => 'BSI Virtual Account',
+            'va_mandiri' => 'Mandiri Bill / VA',
+            'ewallet' => 'E-Wallet (GoPay/OVO/DANA)',
+            'cash' => 'Tunai / Cash di Toko',
+            default => strtoupper((string) $this->payment_method),
+        };
+    }
+
+    /**
+     * Generate simulated virtual account number.
+     */
+    public function getVirtualAccountNumberAttribute(): string
+    {
+        $bankCode = match ($this->payment_method) {
+            'va_bca' => '80777',
+            'va_bsi' => '90012',
+            'va_mandiri' => '88901',
+            default => '70012',
+        };
+
+        $phoneSuffix = preg_replace('/[^0-9]/', '', (string) ($this->customer->phone ?? '08123456789'));
+        if (strlen($phoneSuffix) > 10) {
+            $phoneSuffix = substr($phoneSuffix, -10);
+        } else {
+            $phoneSuffix = str_pad($phoneSuffix, 10, '0', STR_PAD_LEFT);
+        }
+
+        return $bankCode . ' ' . substr($phoneSuffix, 0, 4) . ' ' . substr($phoneSuffix, 4);
     }
 
     /**
