@@ -37,11 +37,88 @@
             font-weight: 800;
             letter-spacing: -0.5px;
             font-size: 1.35rem;
+            display: inline-flex;
+            align-items: center;
+            line-height: 1;
+            padding-top: 0;
+            padding-bottom: 0;
         }
 
         .navbar {
             background-color: #0f172a !important;
             box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.15);
+            padding-top: 0.75rem !important; /* 12px vertical padding */
+            padding-bottom: 0.75rem !important; /* 12px vertical padding */
+        }
+
+        .btn-nav-action {
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 0.42rem 1.05rem;
+            border-radius: 50rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            line-height: 1.4;
+        }
+
+        .btn-nav-back {
+            background-color: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: #f1f5f9 !important;
+            backdrop-filter: blur(8px);
+        }
+
+        .btn-nav-back:hover {
+            background-color: rgba(255, 255, 255, 0.16);
+            border-color: rgba(255, 255, 255, 0.5);
+            color: #ffffff !important;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+            transform: translateX(-2px);
+        }
+
+        .btn-nav-back i {
+            transition: transform 0.2s ease;
+        }
+
+        .btn-nav-back:hover i {
+            transform: translateX(-2px);
+        }
+
+        .btn-nav-portal {
+            background-color: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: #f8fafc !important;
+            backdrop-filter: blur(8px);
+        }
+
+        .btn-nav-portal:hover {
+            background-color: rgba(255, 255, 255, 0.18);
+            border-color: rgba(255, 255, 255, 0.45);
+            color: #ffffff !important;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .btn-nav-portal i {
+            transition: transform 0.2s ease;
+        }
+
+        .btn-nav-portal:hover i {
+            transform: scale(1.1);
+        }
+
+        .nav-user-dropdown {
+            background-color: rgba(255, 255, 255, 0.08) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            transition: all 0.2s ease;
+        }
+
+        .nav-user-dropdown:hover {
+            background-color: rgba(255, 255, 255, 0.15) !important;
+            border-color: rgba(255, 255, 255, 0.35) !important;
         }
 
         .nav-link {
@@ -225,23 +302,23 @@
 <body>
 
     <!-- Main Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark sticky-top py-2">
-        <div class="container">
-            <a class="navbar-brand d-flex align-items-center gap-2 text-white" href="{{ auth()->check() && (auth()->user()->isAdmin() || auth()->user()->isStaff()) ? route('dashboard') : route('catalog.index') }}">
-                <span class="d-inline-flex align-items-center justify-content-center bg-primary rounded-3 p-2 shadow-sm">
-                    <i class="bi bi-cpu-fill text-white fs-5"></i>
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top py-2.5">
+        <div class="container d-flex align-items-center justify-content-between">
+            <a class="navbar-brand d-inline-flex align-items-center gap-2 text-white my-0 py-0" href="{{ auth()->check() && (auth()->user()->isAdmin() || auth()->user()->isStaff()) ? route('dashboard') : route('catalog.index') }}">
+                <span class="d-inline-flex align-items-center justify-content-center bg-primary rounded-3 text-white shadow-sm" style="width: 38px; height: 38px;">
+                    <i class="bi bi-cpu-fill fs-5"></i>
                 </span>
-                <span>Electro<span class="text-primary">Mart</span></span>
+                <span class="fw-bold tracking-tight">Electro<span class="text-primary">Mart</span></span>
             </a>
 
             <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <div class="collapse navbar-collapse" id="mainNavbar">
+            <div class="collapse navbar-collapse align-items-center" id="mainNavbar">
                 @auth
                     <!-- Role-based Navigation Links -->
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3 gap-1">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3 gap-1 align-items-lg-center">
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
                                 <i class="bi bi-speedometer2 me-1"></i> Dashboard
@@ -302,9 +379,9 @@
                     </ul>
 
                     <!-- User Profile & Logout -->
-                    <ul class="navbar-nav ms-auto align-items-lg-center gap-2">
+                    <ul class="navbar-nav ms-auto align-items-center gap-2 my-2 my-lg-0">
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 py-1 px-3 bg-dark bg-opacity-50 rounded-pill border border-secondary border-opacity-25" href="#" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 py-1.5 px-3 rounded-pill nav-user-dropdown" href="#" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="bi bi-person-circle fs-5 text-primary"></i>
                                 <span class="fw-semibold text-white">{{ Auth::user()->name }}</span>
                                 @if(Auth::user()->isAdmin())
@@ -333,19 +410,33 @@
                         </li>
                     </ul>
                 @else
-                    <!-- Guest Navigation Links -->
-                    <ul class="navbar-nav ms-auto align-items-center gap-2">
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('catalog.*') || request()->routeIs('home') ? 'active' : '' }}" href="{{ route('catalog.index') }}">
-                                <i class="bi bi-grid me-1"></i> Katalog Produk
-                            </a>
-                        </li>
-                        <li class="nav-item ms-lg-2">
-                            <a class="nav-link d-inline-flex align-items-center gap-1 text-light py-1 px-3 bg-dark bg-opacity-75 rounded-pill border border-secondary border-opacity-50 small" href="{{ route('login') }}" style="font-size: 0.85rem;">
-                                <i class="bi bi-person-lock text-warning"></i>
-                                <span>Login Pegawai</span>
-                            </a>
-                        </li>
+                    <!-- Guest Navigation: Contextual Top-Right Actions -->
+                    <ul class="navbar-nav ms-auto align-items-center gap-2 my-2 my-lg-0">
+                        @if(request()->routeIs('login') || request()->routeIs('portal.login') || request()->is('login*') || request()->is('portal/login*'))
+                            {{-- On Login Page: Show Back to Catalog button only --}}
+                            <li class="nav-item">
+                                <a href="{{ route('catalog.index') }}" class="btn btn-outline-light btn-sm rounded-pill btn-nav-action btn-nav-back shadow-sm">
+                                    <i class="bi bi-arrow-left"></i>
+                                    <span>Kembali ke Katalog</span>
+                                </a>
+                            </li>
+                        @else
+                            {{-- On Other Guest Pages (e.g. Register): Show Katalog Produk link if not on catalog page --}}
+                            @if(!request()->routeIs('catalog.*') && !request()->routeIs('home') && !request()->is('/') && !request()->is('catalog*'))
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('catalog.index') }}">
+                                        <i class="bi bi-grid me-1"></i> Katalog Produk
+                                    </a>
+                                </li>
+                            @endif
+                            {{-- On Catalog or Public Pages: Show Employee Portal button only --}}
+                            <li class="nav-item">
+                                <a href="{{ route('login') }}" class="btn btn-outline-light btn-sm rounded-pill btn-nav-action btn-nav-portal shadow-sm">
+                                    <i class="bi bi-person-lock text-warning fs-6"></i>
+                                    <span>Portal Pegawai</span>
+                                </a>
+                            </li>
+                        @endif
                     </ul>
                 @endauth
             </div>
